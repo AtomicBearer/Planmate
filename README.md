@@ -2,7 +2,7 @@
 
 Planmate turns a group's interests, availability and budgets into a plan everyone can review and explicitly agree to. It uses vanilla HTML/CSS/JavaScript and a Node server, preserving the cream, beige and brown scrapbook theme, sage/terracotta accents, handwritten headings, original travel artwork and reduced-motion support.
 
-For the presentation, open the [demo guide](http://localhost:3000/demo.html). See [hackathon and public-link deployment](docs/HACKATHON.md) and the [complete API connection map](docs/API-CONNECTIONS.md). `pnpm run check:launch` checks public configuration without printing credentials or making provider requests.
+For public deployment, see [Publish Planmate](docs/DEPLOYMENT.md) and the [API connection map](docs/API-CONNECTIONS.md). `pnpm run check:launch` checks public configuration without printing credentials or making provider requests.
 
 Source files are grouped into `public/` (pages/styles/browser scripts/assets), `shared/` (shared rules/catalogue), `server/` (API/services/storage), `docs/`, `scripts/` and `tests/`. The root `server.js` preserves launch commands; page URLs, invitations and the private root `data/` location remain compatible. Do not deploy `public/` alone for shared planning.
 
@@ -17,9 +17,9 @@ pnpm install --frozen-lockfile
 pnpm start
 ```
 
-Open [Planmate](http://localhost:3000/login.html) or [the dashboard](http://localhost:3000/dashboard.html). By default the server listens on this computer only. `pnpm run start:lan` exposes the local demo on your network; use the computer's reachable address in invitations. Public account deployment needs HTTPS and persistent disk; see [account, storage and recovery instructions](docs/ACCOUNT-STORAGE.md).
+Open [Planmate](http://localhost:3000/login.html) or [the dashboard](http://localhost:3000/dashboard.html). By default the server listens on this computer only. `pnpm run start:lan` exposes the guest planning on your network; use the computer's reachable address in invitations. Public account deployment needs HTTPS and persistent disk; see [account, storage and recovery instructions](docs/ACCOUNT-STORAGE.md).
 
-Directly opening public/dashboard.html provides a browser-only preview with local plans, suggestions, scheduling, comments and expenses. Shared synchronization, account profiles and uploaded photos require the server. The sample Goa plan and sample friends are labelled demonstrations. Create a trip for an empty plan or open a friend's invitation from **Join with an invitation**.
+Directly opening public/dashboard.html provides browser-only planning with local plans, suggestions, scheduling, comments and expenses. Shared synchronization, account profiles and uploaded photos require the server. New visitors start without a trip. Create one, select a saved trip, or open a friend's invitation from **Join with an invitation**. No fictional members or generated itinerary are added.
 
 ## Plan together
 
@@ -41,7 +41,7 @@ Drafts are scoped to the profile/account, trip and member, limited to 60 bounded
 
 ## Accounts and storage
 
-Google sign-in is server-verified when a client ID is configured. Local demo names/emails are explicitly unverified. Account trips bind membership to the verified account, prevent duplicate memberships, support expiring/revocable invitations, organizer transfer and member removal. Historical attribution, expense balances and recorded versions survive departure. Private account profiles follow the account across devices and have independent stale-save protection. Legacy membership claims require verified sign-in, the original membership token, current revision and explicit consent; email matches never claim ownership.
+Google sign-in is server-verified when a client ID is configured. Guest names/emails are explicitly unverified. Account trips bind membership to the verified account, prevent duplicate memberships, support expiring/revocable invitations, organizer transfer and member removal. Historical attribution, expense balances and recorded versions survive departure. Private account profiles follow the account across devices and have independent stale-save protection. Legacy membership claims require verified sign-in, the original membership token, current revision and explicit consent; email matches never claim ownership.
 
 Shared plans now persist in **SQLite**, with transactional revision checks and versioned import from the preserved original JSON. This release targets one Node process on one host with persistent disk. Own JPEG/PNG photos are decoded/re-encoded by Sharp, stripped of camera metadata and quota-limited. Provider photos are separate and transient. [ACCOUNT-STORAGE.md](docs/ACCOUNT-STORAGE.md) explains configuration, consent-based profile import, migrations, limits, backup, restore and rollback.
 
@@ -88,9 +88,9 @@ Google discovery responses and photo references are transient, with `no-store` A
 
 Open **Itinerary → Export PDF**. Planmate downloads an A4 PDF with the cream, brown and sage palette, handwritten headings, original travel doodles, a whole-trip budget summary and a connected timeline for each day. Each stop includes its start/end time, overnight marker where applicable, area, travel buffer, estimated cost, notes and clickable map/venue links. Empty days remain visible as open planning space. Crowded days and long notes continue across numbered pages without being truncated.
 
-The export snapshots the plan when clicked, so shared updates during generation cannot mix versions. Google places use the current details already available in the tab or the stored planning nickname; exporting does not request venue details or photos. The PDF contains the planned itinerary, not unscheduled ideas or account contact details, and notes/costs remain the group's estimates. Preview plans retain a sample-estimate label.
+The export snapshots the plan when clicked, so shared updates during generation cannot mix versions. Google places use the current details already available in the tab or the stored planning nickname; exporting does not request venue details or photos. The PDF contains the planned itinerary, not unscheduled ideas or account contact details, and notes/costs remain the group's estimates.
 
-PDF libraries and embedded fonts load from local project files only when first needed. Export also works in the browser-only preview; no API key, printing dialog or third-party PDF service is required. Supported fonts cover rupee amounts, accented names, Devanagari and monochrome emoji/symbols; other unsupported glyphs use a placeholder rather than failing the whole export. PDFs are static snapshots: export again after editing the itinerary.
+PDF libraries and embedded fonts load from local project files only when first needed. Export also works with browser-only plans; no API key, printing dialog or third-party PDF service is required. Supported fonts cover rupee amounts, accented names, Devanagari and monochrome emoji/symbols; other unsupported glyphs use a placeholder rather than failing the whole export. PDFs are static snapshots: export again after editing the itinerary.
 
 ### Connect city events
 

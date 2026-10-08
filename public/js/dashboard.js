@@ -286,103 +286,28 @@
         const end = new Date(start);
         end.setDate(end.getDate() + 2);
         return {
-            title: "Goa, here we come",
+            title: "",
             city: "Goa",
             start: localDate(start),
             end: localDate(end),
-            budget: 5000,
+            budget: "",
         };
     }
-    function demo() {
-        let s = C.createState(defaultTrip(), { id: "you", name: profileName });
-        s.members.push(
-            { id: "aarav", name: "Aarav" },
-            { id: "riya", name: "Riya" },
-            { id: "maya", name: "Maya" },
-        );
-        const baga = catalogue.places.find((p) => p.name === "Baga Beach"),
-            fontainhas = catalogue.places.find((p) => p.name === "Fontainhas");
-        for (const [p, id, start, end, cost, travel] of [
-            [baga, "sample-beach", "09:00", "10:30", 0, 0],
-            [fontainhas, "sample-walk", "12:00", "13:30", 150, 30],
-        ]) {
-            s = C.apply(
-                s,
-                {
-                    type: "propose",
-                    payload: { id, place: p, note: "A little exploring to start the day." },
-                },
-                "aarav",
-            );
-            s = C.apply(
-                s,
-                {
-                    type: "schedule",
-                    payload: {
-                        id: `${id}-stop`,
-                        proposalId: id,
-                        date: s.trip.start,
-                        start,
-                        end,
-                        cost,
-                        travel,
-                        note: "Preview stop — change the time and estimate to suit your group.",
-                    },
-                },
-                "you",
-            );
-        }
-        s = C.apply(
-            s,
-            {
-                type: "propose",
-                payload: {
-                    id: "sample-cafe",
-                    place: catalogue.places.find((p) => p.name === "Artjuna Café"),
-                    note: "A slow lunch in Anjuna? We can decide the time together.",
-                    preferredDate: s.trip.start,
-                },
-            },
-            "riya",
-        );
-        s = C.apply(s, { type: "vote", payload: { id: "sample-cafe" } }, "maya");
-        s = C.apply(
-            s,
-            {
-                type: "propose",
-                payload: {
-                    id: "sample-club",
-                    place: catalogue.places.find((p) => p.name === "Club Tito’s"),
-                    note: "Keeping one evening free for a night out. Let’s check the programme first.",
-                    preferredDate: s.trip.start,
-                },
-            },
-            "maya",
-        );
-        return { state: s, memberId: "you", preview: true };
+    const validStored = window.PlanmateSpaces.valid;
+    function isWelcome() {
+        return !groupCode && !currentSpace;
     }
-    function validStored(entry) {
-        try {
-            C.validateTrip(entry.state.trip);
-            return (
-                entry.state.version === 1 &&
-                Array.isArray(entry.state.proposals) &&
-                Array.isArray(entry.state.stops) &&
-                entry.state.members.some((m) => m.id === entry.memberId)
-            );
-        } catch {
-            return false;
-        }
-    }
-    if (!validStored(spaces.preview)) {
-        spaces.preview = demo();
-        write(SPACE_KEY, spaces);
-    }
-    const previewUser = spaces.preview.state.members.find((m) => m.id === "you");
-    if (profileName !== "You" && previewUser && previewUser.name !== profileName) {
-        previewUser.name = profileName;
-        spaces.preview.memberId = "you";
-        write(SPACE_KEY, spaces);
+    function activateWelcome() {
+        currentSpace = "";
+        groupCode = "";
+        groupToken = "";
+        memberId = "you";
+        // In-memory scaffolding for browsing and form defaults; never a saved trip.
+        state = C.createState(
+            { ...defaultTrip(), title: "Your next adventure", budget: 0 },
+            { id: memberId, name: profileName },
+        );
+        selectedDay = state.trip.start;
     }
     function activateLocal(id, clearUrl = true) {
         if (!validStored(spaces[id])) return;
@@ -400,14 +325,13 @@
         if (clearUrl && location.protocol !== "file:")
             history.replaceState({}, "", location.pathname);
     }
-    activateLocal(
-        validStored(spaces[navigation.get("space")])
-            ? navigation.get("space")
-            : validStored(spaces[read("planmateActiveSpaceV1", "preview")])
-              ? read("planmateActiveSpaceV1", "preview")
-              : "preview",
-        false,
+    const initialSpace = window.PlanmateSpaces.select(
+        spaces,
+        navigation.get("space"),
+        read("planmateActiveSpaceV1", ""),
     );
+    if (initialSpace) activateLocal(initialSpace, false);
+    else activateWelcome();
     if (profileName !== "You" && read("planmateLastProfileV1", "") !== profileName) {
         const previousName = read("planmateLastProfileV1", "");
         for (const entry of Object.values(spaces)) {
@@ -416,12 +340,9 @@
             const own = entry.state.members.find((m) => m.id === ownId);
             if (own && (own.name === previousName || ownId === "you")) own.name = profileName;
         }
-        state = C.clone(spaces[currentSpace].state);
+        if (!isWelcome()) state = C.clone(spaces[currentSpace].state);
         write(SPACE_KEY, spaces);
         write("planmateLastProfileV1", profileName);
-    }
-    function isPreview() {
-        return !groupCode && Boolean(spaces[currentSpace]?.preview);
     }
     function memberName(id) {
         return state.members.find((m) => m.id === id)?.name || "A friend";
@@ -482,16 +403,16 @@
     }
     function renderHeader() {
         const progress = C.agreement.progress(state, memberId);
-        document.querySelector(".hero").classList.toggle("compact-trip", !isPreview());
-        $("entryGuide").hidden = !isPreview();
+        document.querySelector(".hero").classList.add("compact-trip");
+        $("entryGuide").hidden = !isWelcome();
         const organizer = state.organizerId === memberId;
         const account = window.PlanmateAccount.account(),
             accountConfig = window.PlanmateAccount.config();
         $("accountBanner").innerHTML = account
             ? `Signed in as ${esc(account.name)} · Private profile syncs across devices. <button class="text-button" data-account-action="signout">Sign out</button>${groupCode && !state.members.find((m) => m.id === memberId)?.accountId ? '<button class="text-button" data-action="claim-membership">Bind this legacy membership to my account</button>' : ""}`
-            : `${accountConfig.configured ? "Local demo session" : "Verified sign-in is not configured · Local demo"} <a href="login.html?${esc(navigationContext())}">Open sign-in</a>`;
+            : `${groupCode ? "Guest access is saved on this device" : "Your profile stays on this device"} · <a href="login.html?${esc(navigationContext())}">${accountConfig.configured ? "Sign in for an account" : "Manage your sign-in"}</a>`;
         $("tripTitle").innerHTML = `${esc(state.trip.title)}<span aria-hidden="true">✦</span>`;
-        $("sidebarTitle").textContent = state.trip.title;
+        $("sidebarTitle").textContent = isWelcome() ? "Your trips" : state.trip.title;
         $("tripDates").textContent =
             `${fmtDate(state.trip.start)} – ${fmtDate(state.trip.end)} ${state.trip.end.slice(0, 4)}`;
         $("tripDateLabel").textContent = state.availability.chosen
@@ -506,9 +427,9 @@
             .map(avatar)
             .join("");
         $("memberSummary").textContent =
-            `${state.members.filter((m) => !m.removed).length} ${state.members.filter((m) => !m.removed).length === 1 ? "planner" : "friends"}${isPreview() ? " · preview" : ""}`;
+            `${state.members.filter((m) => !m.removed).length} ${state.members.filter((m) => !m.removed).length === 1 ? "planner" : "friends"}`;
         const personal = window.PlanmateProfile.load(
-            groupCode ? memberName(memberId) : profileName,
+            isWelcome() ? profileName : memberName(memberId),
         );
         $("profileName").textContent = personal.name;
         for (const id of ["profileAvatar", "mobileProfileAvatar"]) {
@@ -650,7 +571,7 @@
     }
     function renderGroup() {
         $("workspace").innerHTML =
-            `<div class="section-heading"><div><h2>Good company, great plans</h2><p>Bring everyone’s discoveries into one shared adventure.</p></div></div><div class="info-box"><strong>${groupCode ? "Your shared planning space" : isPreview() ? "You’re exploring a preview group" : "This plan is saved on your browser"}</strong><p>${groupCode ? "Friends with your invitation can join as themselves, propose places, vote and edit the itinerary. Changes refresh every few seconds." : isPreview() ? "Aarav, Riya and Maya are sample planners. Try their perspectives below, or start a shared trip with your own friends." : "Start a shared trip to invite friends on their own devices."}</p>${isPreview() ? `<label for="previewMember">Try the preview as</label><select id="previewMember" class="preview-selector">${state.members.map((m) => `<option value="${esc(m.id)}" ${memberId === m.id ? "selected" : ""}>${esc(m.name)}${m.id === "you" ? " (you)" : " (sample friend)"}</option>`).join("")}</select>` : ""}</div><div class="member-grid">${state.members.map((m, i) => `<div class="member-card">${avatar(m, i)}<div><strong>${esc(m.name)}${m.removed ? " · former member" : ""}${m.id === memberId ? " · you" : ""}</strong><small>${state.proposals.filter((p) => p.by === m.id).length} ideas proposed · ${state.proposals.filter((p) => p.responses[m.id]).length} suggestion responses</small></div></div>`).join("")}</div><div class="group-actions"><button class="button primary" data-action="${groupCode ? "invite" : "new-trip"}">${icon("users")}${groupCode ? "Invite a friend" : "Start a shared trip"}</button><button class="button secondary" data-action="switch-plan">Switch planning space</button></div><div class="info-box" style="margin-top:20px"><strong>One idea → everyone’s say → a time in the itinerary</strong><p>Any member can schedule an idea once the group is ready. Suggestion responses help you decide; it doesn’t automatically book or approve a venue.</p><p>Travel times and costs are your group’s estimates. Confirm availability, opening hours and event tickets with the venue.</p></div>`;
+            `<div class="section-heading"><div><h2>Good company, great plans</h2><p>Bring everyone’s discoveries into one shared adventure.</p></div></div><div class="info-box"><strong>${groupCode ? "Your shared planning space" : "This plan is saved on your device"}</strong><p>${groupCode ? "Friends with your invitation can join as themselves, propose places, respond and plan the itinerary together." : "Create a shared trip to invite friends on their own devices."}</p></div><div class="member-grid">${state.members.map((m, i) => `<div class="member-card">${avatar(m, i)}<div><strong>${esc(m.name)}${m.removed ? " · former member" : ""}${m.id === memberId ? " · you" : ""}</strong><small>${state.proposals.filter((p) => p.by === m.id).length} ideas proposed · ${state.proposals.filter((p) => p.responses[m.id]).length} suggestion responses</small></div></div>`).join("")}</div><div class="group-actions"><button class="button primary" data-action="${groupCode ? "invite" : "new-trip"}">${icon("users")}${groupCode ? "Invite a friend" : "Start a shared trip"}</button><button class="button secondary" data-action="switch-plan">Switch trip</button></div><div class="info-box" style="margin-top:20px"><strong>Ideas → responses → a shared itinerary</strong><p>Suggestion responses help your group decide. The organizer chooses the date and confirms the final plan explicitly.</p><p>Costs and travel buffers are your group’s estimates. Check opening hours and event tickets with the venue.</p></div>`;
     }
     function renderAside() {
         selectedDay = renderers.renderAside({ state, memberId, selectedDay });
@@ -665,7 +586,8 @@
             );
     }
     function render() {
-        $("entryGuide").hidden = openingShared || !isPreview();
+        const welcome = isWelcome();
+        $("entryGuide").hidden = openingShared || !welcome;
         $("mobileView").disabled = openingShared;
         for (const selector of [
             ".hero",
@@ -674,10 +596,10 @@
             "#itineraryAside",
             "#draftRecovery",
         ])
-            document.querySelector(selector).hidden = openingShared;
+            document.querySelector(selector).hidden = openingShared || welcome;
         document
             .querySelector(".planning-layout")
-            .classList.toggle("opening-shared", openingShared);
+            .classList.toggle("opening-shared", openingShared || welcome);
         document.querySelectorAll("#sideNav button").forEach((button) => {
             button.disabled = openingShared;
         });
@@ -699,6 +621,18 @@
         if (!C.dates(state.trip.start, state.trip.end).includes(selectedDay))
             selectedDay = state.trip.start;
         renderHeader();
+        if (welcome) {
+            setStatus("Ready when you are");
+            document.querySelector(".view-tabs").hidden = true;
+            if (view === "discover" || view === "saved") renderDiscover();
+            else
+                $("workspace").innerHTML = empty(
+                    "Choose a trip to get started",
+                    "Dates, preferences, ideas and memories belong to a trip. Create one or open an invitation to continue.",
+                    '<button class="button primary" data-action="new-trip">Create a trip</button><button class="button secondary" data-action="open-join">Join with an invitation</button>',
+                );
+            return;
+        }
         if (view === "discover" || view === "saved") renderDiscover();
         else if (view === "ideas") renderIdeas();
         else if (view === "itinerary") renderItinerary();
@@ -722,7 +656,7 @@
     function navigationContext() {
         return window.PlanmateNavigation.context({
             view,
-            day: view === "today" ? planningUI.todayDay?.() : selectedDay,
+            day: isWelcome() ? "" : view === "today" ? planningUI.todayDay?.() : selectedDay,
             group: groupCode,
             space: currentSpace,
         });
@@ -737,16 +671,10 @@
         updateNavigation();
     }
     function persistLocal() {
-        if (groupCode) return;
+        if (groupCode || isWelcome()) return;
         spaces[currentSpace] = { ...spaces[currentSpace], state: C.clone(state), memberId };
         write(SPACE_KEY, spaces);
-        setStatus(
-            storageOk
-                ? isPreview()
-                    ? "Preview · saved on this browser"
-                    : "Saved on this browser"
-                : "Keep this tab open · not saved",
-        );
+        setStatus(storageOk ? "Saved on this device" : "Keep this tab open · not saved");
     }
     async function request(path, options = {}) {
         let response;
@@ -780,6 +708,7 @@
         return data;
     }
     async function mutate(type, payload) {
+        if (isWelcome()) throw new Error("Create or open a trip before saving this change.");
         if (busy) throw new Error("Wait for the current change to finish.");
         busy = true;
         try {
@@ -831,6 +760,12 @@
     function openPropose(id) {
         const p = findPlace(id);
         if (!p) return;
+        if (isWelcome()) {
+            openTrip(false, p.city);
+            return toast(
+                "Create a trip to propose this place. You can keep browsing and save it for later.",
+            );
+        }
         if (p.eventDate && (p.eventDate > state.trip.end || p.eventEndDate < state.trip.start))
             return toast(
                 "This event is outside your trip dates. Edit the trip dates to include it first.",
@@ -858,6 +793,7 @@
         );
     }
     function openCustom() {
+        if (isWelcome()) return openTrip();
         openDialog(
             "A discovery of your own",
             "Any place. Any city in India. Any event you’ve found.",
@@ -918,7 +854,7 @@
             editing
                 ? "Change the dates, destination or budget together."
                 : "Give your next plan a name and invite your people.",
-            `<form data-form="${editing ? "edit-trip" : "new-trip"}">${field("Trip name", `<input name="title" value="${esc(t.title)}" maxlength="100" required>`)}${field("Main destination", `<input name="city" value="${esc(t.city)}" maxlength="60" list="tripCities" required><datalist id="tripCities">${catalogue.cities.map((c) => `<option value="${esc(c)}">`).join("")}</datalist>`)}<div class="form-row">${field("First day", `<input type="date" name="start" value="${t.start}" required>`)}${field("Last day", `<input type="date" name="end" value="${t.end}" required>`)}</div>${field("Whole-trip budget per person (₹)", `<input type="number" name="budget" min="0" max="1000000" step="1" value="${t.budget}" required>`)}${!editing ? `${field("Your name", `<input name="name" value="${esc(profileName)}" maxlength="60" required>`)}<label class="checkbox-field"><input name="shared" type="checkbox" ${serverAvailable ? "checked" : "disabled"}>Shared plan · Friends can join on their own devices</label>${!serverAvailable ? '<div class="info-box">Start the local planning server to enable shared trips. You can create a browser-only plan now.</div>' : ""}` : ""}${formError}${actions(editing ? "Save trip details" : "Create planning space")}</form>`,
+            `<form data-form="${editing ? "edit-trip" : "new-trip"}">${field("Trip name", `<input name="title" value="${esc(t.title)}" maxlength="100" required>`)}${field("Main destination", `<input name="city" value="${esc(t.city)}" maxlength="60" list="tripCities" required><datalist id="tripCities">${catalogue.cities.map((c) => `<option value="${esc(c)}">`).join("")}</datalist>`)}<div class="form-row">${field("First day", `<input type="date" name="start" value="${t.start}" required>`)}${field("Last day", `<input type="date" name="end" value="${t.end}" required>`)}</div>${field("Whole-trip budget per person (₹)", `<input type="number" name="budget" min="0" max="1000000" step="1" value="${t.budget}" required>`)}${!editing ? `${field("Your name", `<input name="name" value="${esc(profileName === "You" ? "" : profileName)}" placeholder="Your name" maxlength="60" required>`)}<label class="checkbox-field"><input name="shared" type="checkbox" ${serverAvailable ? "checked" : "disabled"}>Shared plan · Friends can join on their own devices</label>${!serverAvailable ? '<div class="info-box">Shared planning is temporarily unavailable. You can save a plan on this device and try again later.</div>' : ""}` : ""}${formError}${actions(editing ? "Save trip details" : "Create planning space")}</form>`,
         );
     }
     function inviteUrl() {
@@ -927,27 +863,29 @@
         return `${location.origin}${location.pathname}?${params}`;
     }
     function openInvite() {
+        if (isWelcome()) return openTrip();
         if (!groupCode)
             return openDialog(
                 "Plans are better together",
                 "Start a shared space for your friends.",
-                `<div class="info-box"><strong>${serverAvailable ? "Ready for your own group" : "Shared planning needs the local server"}</strong><p>${serverAvailable ? "Create a shared trip, then send its invitation link to your friends. Each person joins with their own name." : "Run npm start in the project folder, then open http://localhost:3000. Your browser-only preview stays saved."}</p></div><div class="dialog-actions"><button class="button primary" data-action="new-trip">Start a new trip ${icon("arrow")}</button></div>`,
+                `<div class="info-box"><strong>${serverAvailable ? "Ready for your own group" : "Shared planning is unavailable"}</strong><p>${serverAvailable ? "Create a shared trip, then send its invitation link to your friends. Each person joins with their own name." : "We couldn’t reach shared planning. Try again shortly; your saved device plans are still available."}</p></div><div class="dialog-actions"><button class="button primary" data-action="new-trip">Start a new trip ${icon("arrow")}</button></div>`,
             );
         openDialog(
             "Bring your people",
             "Invitations expire after seven days. The organizer can replace or revoke the link.",
-            `${sessions[groupCode]?.invite ? `<div class="invite-link">${esc(inviteUrl())}</div><button class="button primary" data-action="copy-invite">Copy invitation</button>` : "<p>No invitation link is saved on this device.</p>"}<div class="info-box"><p>For another device, use the server's reachable address. Account trips require verified sign-in. Replacing an invitation invalidates the previous link.</p></div>${state.organizerId === memberId ? '<div class="dialog-actions"><button class="button secondary" data-action="rotate-invite">Create a new invitation</button><button class="button secondary" data-action="revoke-invite">Revoke invitations</button></div>' : "<p>Ask the organizer for the current invitation.</p>"}`,
+            `${sessions[groupCode]?.invite ? `<div class="invite-link">${esc(inviteUrl())}</div><button class="button primary" data-action="copy-invite">Copy invitation</button>` : "<p>No invitation link is saved on this device.</p>"}<div class="info-box"><p>Share this link with your friends. Account trips require sign-in. Replacing an invitation invalidates the previous link.</p></div>${state.organizerId === memberId ? '<div class="dialog-actions"><button class="button secondary" data-action="rotate-invite">Create a new invitation</button><button class="button secondary" data-action="revoke-invite">Revoke invitations</button></div>' : "<p>Ask the organizer for the current invitation.</p>"}`,
         );
     }
     function openSwitch() {
+        const localPlans = window.PlanmateSpaces.entries(spaces, { includeLegacy: true });
+        const hasPlans = localPlans.length || Object.keys(sessions).length;
         openDialog(
             "Which adventure next?",
             "Your saved and shared planning spaces.",
-            `<div class="group-actions">${Object.entries(spaces)
-                .filter(([, entry]) => validStored(entry))
+            `${hasPlans ? "" : '<div class="info-box"><strong>Your trips will appear here</strong><p>Create your first trip, or open an invitation from a friend.</p></div>'}<div class="group-actions">${localPlans
                 .map(
                     ([id, entry]) =>
-                        `<button class="button secondary" data-local-space="${esc(id)}">${esc(entry.state.trip.title)}${entry.preview ? " · preview" : ""}</button>`,
+                        `<button class="button secondary" data-local-space="${esc(id)}">${esc(entry.state.trip.title)}</button>`,
                 )
                 .join("")}${Object.entries(sessions)
                 .map(
@@ -956,18 +894,18 @@
                 )
                 .join(
                     "",
-                )}</div><div class="dialog-actions" style="margin-top:20px"><button class="button primary" data-action="new-trip">+ Start a new adventure</button></div>`,
+                )}</div><div class="dialog-actions" style="margin-top:20px"><button class="button primary" data-action="new-trip">+ Start a new adventure</button><button class="button secondary" data-action="open-join">Join with an invitation</button></div>`,
         );
     }
     async function exportPlan() {
         if (exportBusy) return;
+        if (isWelcome()) return openTrip();
         const snapshot = C.clone(state),
-            stops = C.clone(displayStops()),
-            preview = isPreview();
+            stops = C.clone(displayStops());
         exportBusy = true;
         if (view === "itinerary") render();
         try {
-            const bytes = await window.PlanmateExport.createPdf(snapshot, { stops, preview });
+            const bytes = await window.PlanmateExport.createPdf(snapshot, { stops });
             window.PlanmateExport.download(bytes, snapshot.trip.title);
             toast("Your PDF itinerary is ready to share.");
         } finally {
@@ -1034,7 +972,7 @@
         openDialog(
             "Your friends saved you a spot",
             "Join their trip and bring your own ideas.",
-            `<p><a href="login.html?${esc(new URLSearchParams({ group: code, ...(navigation.get("invite") ? { invite: navigation.get("invite") } : {}) }))}">Sign in for account access</a></p><form data-form="join" data-code="${esc(code)}">${field("What should your friends call you?", `<input name="name" value="${esc(profileName === "You" ? "" : profileName)}" placeholder="Your name" maxlength="60" required>`)}<div class="info-box"><p>Account trips require sign-in. A local demo invitation joins an unverified demo member.</p></div>${formError}${actions("Join the planning space")}</form>`,
+            `<p><a href="login.html?${esc(new URLSearchParams({ group: code, ...(navigation.get("invite") ? { invite: navigation.get("invite") } : {}) }))}">Sign in for account access</a></p><form data-form="join" data-code="${esc(code)}">${field("What should your friends call you?", `<input name="name" value="${esc(profileName === "You" ? "" : profileName)}" placeholder="Your name" maxlength="60" required>`)}<div class="info-box"><p>Account trips require sign-in. Guest invitations use a name for this trip; they do not verify an account.</p></div>${formError}${actions("Join the planning space")}</form>`,
         );
     }
     document.addEventListener("click", async (event) => {
@@ -1060,7 +998,11 @@
                 return;
             }
             if (button.dataset.localSpace) {
-                activateLocal(button.dataset.localSpace);
+                const id = button.dataset.localSpace;
+                if (!validStored(spaces[id])) return toast("That saved trip is unavailable.");
+                // Opening an older saved record explicitly keeps it as a personal plan.
+                if (spaces[id].preview) spaces[id].preview = false;
+                activateLocal(id);
                 $("appDialog").close();
                 setView("discover");
                 persistLocal();
@@ -1239,12 +1181,6 @@
         if (event.target.id === "eventType") {
             eventType = event.target.value;
             renderResults();
-        }
-        if (event.target.id === "previewMember" && isPreview()) {
-            memberId = event.target.value;
-            persistLocal();
-            render();
-            toast(`Previewing as ${memberName(memberId)}.`);
         }
         if (event.target.id === "mobileView") setView(event.target.value);
     });
@@ -1541,14 +1477,14 @@
         setStatus(
             openingShared
                 ? "Opening shared plan…"
-                : isPreview()
-                  ? "Preview · saved on this browser"
-                  : "Saved on this browser",
+                : isWelcome()
+                  ? "Ready when you are"
+                  : "Saved on this device",
         );
         if (location.protocol === "file:") {
             if (openingShared) {
                 sharedOpenMessage =
-                    "Shared invitations need the planning server. Run npm start and open this invitation through its server address.";
+                    "Open this invitation from the Planmate website to join the shared trip.";
                 render();
                 setStatus("Shared plan needs the server");
             }
@@ -1574,7 +1510,7 @@
             if (serverAvailable) await activateShared(code);
             else {
                 sharedOpenMessage =
-                    "The shared planning server is unavailable. Start it at this address, then reload to open the group.";
+                    "We couldn’t open the shared trip. Check your connection and reload to try again.";
                 render();
                 setStatus("Shared plan unavailable · reload to retry");
             }
@@ -1717,7 +1653,6 @@
         mapsUrl,
         displayPlace,
         displayStops,
-        isPreview,
         empty,
     });
     init();

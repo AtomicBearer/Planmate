@@ -88,7 +88,7 @@ loginForm.addEventListener("submit", (event) => {
         return;
     }
 
-    // This prototype saves local display details. It does not authenticate an account.
+    // Device details are separate from a verified account.
     const user = {
         name: fullNameInput.value.trim(),
         email: emailInput.value.trim(),
@@ -138,8 +138,12 @@ if (window.PlanmateAccount)
             window.PlanmateAccount.error() ||
             (cfg.configured
                 ? "Verified Google sign-in · profiles and trips follow your account."
-                : "Verified sign-in is not configured. Local demo details stay on this browser.");
-        if (cfg.required) loginForm.hidden = true;
+                : "Account sign-in is unavailable. You can continue on this device.");
+        if (cfg.required) {
+            loginForm.hidden = true;
+            document.querySelector(".divider").hidden = true;
+            document.getElementById("localProfileNote").hidden = true;
+        }
         if (!cfg.configured) return;
         try {
             const challenge = await window.PlanmateAccount.call("/api/auth/challenge");

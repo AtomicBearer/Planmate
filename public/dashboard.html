@@ -30,6 +30,7 @@
         <script src="../shared/expense-rules.js" defer></script>
         <script src="../shared/planning-rules.js" defer></script>
         <script src="../shared/planner-core.js" defer></script>
+        <script src="js/planning-spaces.js" defer></script>
         <script src="../shared/catalogue.js" defer></script>
         <script src="../shared/profile-rules.js" defer></script>
         <script src="js/profile-store.js" defer></script>
@@ -159,8 +160,8 @@
                 <div class="sidebar-plan"
                     ><span class="tiny-label">YOUR PLANNING SPACE</span
                     ><button id="switchPlan" class="current-plan"
-                        ><span class="plan-dot"></span
-                        ><span id="sidebarTitle">Goa, here we come</span><span>⌄</span></button
+                        ><span class="plan-dot"></span><span id="sidebarTitle">Your trips</span
+                        ><span>⌄</span></button
                     ><button class="text-button" data-action="new-trip"
                         >+ Start another adventure</button
                     ></div
@@ -190,15 +191,12 @@
                     ><div class="breadcrumb"
                         ><span>Your space</span><span>/</span><strong>Trip planner</strong></div
                     ><div class="top-actions"
-                        ><a
-                            class="button secondary small"
-                            href="demo.html"
-                            target="_blank"
-                            rel="noopener"
-                            aria-label="Demo guide (opens in a new tab)"
-                            >Demo guide ↗</a
-                        ><span class="save-status" id="saveStatus"
-                            ><span></span>Saved on this browser</span
+                        ><span class="save-status" id="saveStatus" role="status"
+                            ><span></span>Opening your space…</span
+                        ><button
+                            class="button secondary small mobile-trip-switch"
+                            data-action="switch-plan"
+                            ><svg><use href="#i-compass" /></svg>My trips</button
                         ><button class="button secondary small" data-action="invite"
                             ><svg><use href="#i-users" /></svg>Invite friends</button
                         ><a
@@ -236,6 +234,7 @@
                         id="entryGuide"
                         class="plan-panel entry-guide"
                         aria-label="Start planning"
+                        hidden
                     >
                         <h2>Your next adventure starts here</h2>
                         <p
@@ -250,12 +249,17 @@
                                 >Join with an invitation</button
                             ></div
                         >
-                        <small>The plan below is a sample you can explore.</small>
+                        <small
+                            >Have a trip already?
+                            <button class="text-button" data-action="switch-plan"
+                                >Open your saved trips →</button
+                            ></small
+                        >
                     </section>
-                    <section class="hero" aria-labelledby="tripTitle">
+                    <section class="hero" aria-labelledby="tripTitle" hidden>
                         <div class="hero-copy"
                             ><span class="eyebrow">A LITTLE ESCAPE, A LOT OF MEMORIES</span
-                            ><h1 id="tripTitle">Goa, here we come<span>✦</span></h1
+                            ><h1 id="tripTitle">Your next adventure<span>✦</span></h1
                             ><p id="heroSubtitle"
                                 >Good company. Open possibilities. One plan everyone loves.</p
                             ><div class="hero-bottom"
@@ -352,7 +356,7 @@
                                 /></svg
                         ></div>
                     </section>
-                    <section class="trip-strip" aria-label="Trip overview"
+                    <section class="trip-strip" aria-label="Trip overview" hidden
                         ><button class="trip-detail" data-view="group"
                             ><span class="detail-icon"
                                 ><svg><use href="#i-calendar" /></svg></span
@@ -370,7 +374,7 @@
                             ><span class="detail-icon currency">₹</span
                             ><span
                                 ><small>BUDGET PER PERSON</small
-                                ><strong id="tripBudget">₹5,000 <span>planned</span></strong></span
+                                ><strong id="tripBudget">Set your budget</strong></span
                             ></div
                         ></section
                     >
@@ -379,6 +383,7 @@
                         class="planning-progress"
                         aria-label="Planning progress"
                         aria-live="polite"
+                        hidden
                     ></section>
                     <section
                         id="draftRecovery"
@@ -421,6 +426,7 @@
                         <aside
                             class="itinerary-aside"
                             id="itineraryAside"
+                            hidden
                             aria-label="Itinerary preview"
                         ></aside>
                     </div>

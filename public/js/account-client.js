@@ -2,7 +2,7 @@
 (function () {
     "use strict";
     let user = null,
-        config = { configured: false, required: false, mode: "local-demo" },
+        config = { configured: false, required: false, mode: "guest" },
         error = "";
     const headers = () => (user ? { "X-Planmate-CSRF": user.csrf } : {});
     async function call(path, options = {}) {

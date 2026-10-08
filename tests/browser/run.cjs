@@ -10,7 +10,7 @@ const cases = [
     "account",
     "discovery-ui",
     "night-fit",
-    "demo",
+    "product",
 ];
 (async () => {
     const selected = process.argv.slice(2).filter((argument) => argument !== "--");

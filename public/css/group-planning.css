@@ -24,6 +24,25 @@
     line-height: 1.6;
     margin-bottom: 14px;
 }
+.entry-guide {
+    padding: 32px;
+    background: var(--white) url("../assets/travel-doodles.svg") right center / 280px auto no-repeat;
+}
+.entry-guide h2 {
+    font: 40px/1.15 var(--font-hand);
+    color: var(--brown-dark);
+    max-width: 560px;
+    margin-bottom: 14px;
+}
+.entry-guide p {
+    max-width: 560px;
+}
+.entry-guide .plan-row {
+    margin-top: 22px;
+}
+.entry-guide .text-button {
+    font: inherit;
+}
 .entry-guide small {
     display: block;
     margin-top: 12px;

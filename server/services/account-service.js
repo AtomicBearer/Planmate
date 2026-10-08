@@ -24,7 +24,7 @@ function createAccounts(store, { env = process.env, verify, now = Date.now } = {
         secure = env.SESSION_SECURE === "true";
     if (required && !configured)
         throw new Error(
-            "ACCOUNT_MODE=required needs GOOGLE_CLIENT_ID. No prototype access is enabled in required mode.",
+            "ACCOUNT_MODE=required needs GOOGLE_CLIENT_ID. Guest access is disabled in required mode.",
         );
     const client = new OAuth2Client(clientId),
         publicOrigin = env.PUBLIC_ORIGIN || "",
@@ -76,7 +76,7 @@ function createAccounts(store, { env = process.env, verify, now = Date.now } = {
                 configured,
                 required,
                 clientId,
-                mode: required ? "accounts-required" : "local-demo",
+                mode: required ? "accounts-required" : "guest",
                 secure,
             });
         if (route === "session" && req.method === "GET")

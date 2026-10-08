@@ -24,7 +24,7 @@ function checkLaunch(env = process.env) {
         errors.push("Set SESSION_SECURE=true for public HTTPS sign-in.");
     if (env.ACCOUNT_MODE !== "required")
         warnings.push(
-            "Demo access is enabled: local names are unverified and discovery is public. Prefer ACCOUNT_MODE=required for public accounts; keep demo mode only for a labelled, limited hackathon demonstration.",
+            "Guest access is enabled: names are unverified and discovery is public. Set ACCOUNT_MODE=required for verified public accounts.",
         );
     if (
         env.ACCOUNT_MODE === "required" &&

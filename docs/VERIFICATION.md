@@ -1,16 +1,18 @@
-# Implementation and verification — 8 October 2026
+# Product review and verification — 8 October 2026
 
-Planmate keeps its vanilla architecture and travel scrapbook theme. Independent implementation work for the six requested phases is complete. Live provider validation remains incomplete because credentials are unconfigured. This report distinguishes implemented behavior, automated evidence and remaining release work.
+Planmate keeps its vanilla architecture, planning features and travel scrapbook theme. This report records the current product polish, existing feature checks and remaining provider/deployment work. Live provider validation remains incomplete because credentials are unconfigured.
 
-## Hackathon preparation review
+## Product polish and organization
 
 All original features and page URLs are retained. Browser pages/styles/scripts/assets now live in `public/`, browser/server rules in `shared/`, private implementation in `server/` and guides in `docs/`. The root launch entry remains `server.js`; root `data/`, browser storage keys and invitation formats are unchanged. Explicit public asset aliases preserve older URLs. Tests verify the aliases, root launch exports and private-file denial after the move.
 
-Added the themed `/demo.html` walkthrough and configuration-only connection status, linked from login/dashboard without replacing either page. Loading, empty/error, retry, safe new-tab links, 320/390px and desktop behavior were checked. The header wraps on narrow screens; the sample friends summary also wraps without overflowing.
+Removed the presentation page, its assets, navigation links and walkthrough documentation. New visitors now start with Create/Join and can browse places before choosing a trip. No trip, fictional friends, votes, prices or itinerary are generated. Trip creation asks for a real name and budget; personal plans persist and reopen. Planning sections explain how to choose a trip before using their controls. Saved plans, shared invitations, storage keys and existing feature flows are retained.
+
+Polish includes readable place cards on narrow phones, a useful empty map, empty saved-trip guidance, a mobile **My trips** control, clear device-profile/account copy and readable first-use states. Login keeps its original decorative travel card, handwritten headings and theme. Map attribution, supplied coordinates, directions, estimate labels and missing-location feedback are retained without exposing API setup instructions in the empty map.
 
 API fixes include `.env` loading for the Goa pilot, Google sign-in referrer/popup headers, and a direct Google Routes adapter that preserves the existing feed and manual buffers. In required-account mode, connected discovery requires verified sign-in. Fixture tests cover route request/source arithmetic, malformed/empty/rejected responses, feed precedence, credential privacy and status permissions. No live Google or event requests were made.
 
-Added `scripts/check-launch.js`, [API-CONNECTIONS.md](API-CONNECTIONS.md) and [HACKATHON.md](HACKATHON.md). The local public preflight intentionally reports four missing deployment settings: host binding, exact HTTPS origin, secure cookies and an absolute persistent data path. All five external services remain unconfigured. No public deployment is claimed.
+Retained `scripts/check-launch.js` and [API-CONNECTIONS.md](API-CONNECTIONS.md); [DEPLOYMENT.md](DEPLOYMENT.md) describes publishing the same Node application. The local public preflight reports missing deployment settings: host binding, exact HTTPS origin, secure cookies and an absolute persistent data path. All five external services remain unconfigured. No public deployment is claimed.
 
 ## Completed behavior
 
@@ -25,7 +27,7 @@ Added `scripts/check-launch.js`, [API-CONNECTIONS.md](API-CONNECTIONS.md) and [H
 
 ## Files added or updated
 
-New browser/rule modules: `public/js/form-drafts.js`, `public/js/dashboard-navigation.js`, `public/js/shared-sync.js`, `public/js/planner-ui.js`, `public/js/dashboard-renderers.js`, `public/js/place-illustrations.js`, `public/css/dashboard-responsive.css`, `public/js/account-client.js`, `shared/profile-rules.js`, `shared/planning-time.js`.
+Browser/rule modules include `public/js/planning-spaces.js` for non-mutating saved-plan selection, `public/js/form-drafts.js`, `public/js/dashboard-navigation.js`, `public/js/shared-sync.js`, `public/js/planner-ui.js`, `public/js/dashboard-renderers.js`, `public/js/place-illustrations.js`, `public/css/dashboard-responsive.css`, `public/js/account-client.js`, `shared/profile-rules.js` and `shared/planning-time.js`.
 
 New server/maintenance modules: `server/services/account-service.js`, `server/storage/plan-store.js`, `scripts/backup.js`, `scripts/pilot-goa.js`. Module responsibilities and dependency order are in [MODULES.md](MODULES.md).
 
@@ -33,29 +35,29 @@ Updated integration files: dashboard/profile/login page wiring and logic, `publi
 
 New or extended verification: draft, account, agreement, fit, overnight, synchronization, discovery and shared-server tests; nine cases in `tests/browser/`; `tests/server-fixture.js`; `.github/workflows/check.yml`. Documentation: README, this report, module map and [ACCOUNT-STORAGE.md](ACCOUNT-STORAGE.md).
 
-The reviewed dashboard was approximately 1,644 JavaScript and 1,967 CSS lines. Current dashboard composition is 1,725 JavaScript lines after adding accounts/draft adapters and extracting responsibilities. Base CSS is 1,567 lines with 401 responsive lines in a separate module. Line counts alone are not a measure of behavior or maintainability; the dependency boundaries and tests are the meaningful changes.
+The dashboard composes focused navigation, rendering, drafts, synchronization and planning modules. Module boundaries and behavior tests are the relevant checks; line counts alone do not establish maintainability.
 
 ## Compatibility and recovery
 
 SQLite schema version 1 imports preserved JSON in a transaction, creates a pre-migration backup and records an idempotent import marker. Restart and competing stale revisions are tested. Planning feature version 2 supplies backward-compatible overnight/category-need defaults; existing votes, members, comments, itinerary, confirmation snapshots, expenses and uploaded-photo references survive. Regenerate older alternatives before applying them. Browser-local profiles/plans remain separate and are not claimed by matching email.
 
-Backup/restore includes the database and referenced uploaded media, checksums and integrity checks, requires a stopped server, restores to a new directory and invalidates restored account sessions. The documented storage target is a single Node host with persistent disk. No multi-instance deployment is claimed. No existing JSON file was found in the local default data directory when the updated preview started; it created the SQLite database. Migration/recovery were verified with disposable fixtures.
+Backup/restore includes the database and referenced uploaded media, checksums and integrity checks, requires a stopped server, restores to a new directory and invalidates restored account sessions. The documented storage target is a single Node host with persistent disk. No multi-instance deployment is claimed. Migration/recovery were verified with disposable fixtures. This polish does not reset browser records or server data. Older auto-generated examples are not opened automatically; saved work remains accessible through the trip picker. Opening an older record explicitly preserves its contents and keeps it as a personal plan.
 
 ## Commands and results
 
 - `pnpm install --frozen-lockfile`: pinned dependencies installed successfully.
-- `pnpm run check`: passed JavaScript syntax, page links, dependency order, 45 public files and formatting.
-- `pnpm test`: **106 tests passed, 0 failed**. Includes expense arithmetic, migration/restart/backup, account permissions, private drafts, discovery, recommendations, overnight boundaries, stale shared edits, route-result revocation and real PDF generation.
-- `PLANMATE_BROWSER_CHANNEL=chrome pnpm run test:browser`: **9 cases passed**: loading, profile-context, cohesion, planning, drafts, account, discovery-ui, night-fit and demo. Environment variable syntax depends on the shell; on PowerShell use `$env:PLANMATE_BROWSER_CHANNEL='chrome'`.
+- `pnpm run check`: passed JavaScript syntax, page links, dependency order, 43 public files and formatting.
+- `pnpm test`: **110 tests passed, 0 failed**. Includes saved-plan selection, expense arithmetic, migration/restart/backup, account permissions, private drafts, discovery, recommendations, overnight boundaries, stale shared edits, route-result revocation and real PDF generation.
+- `PLANMATE_BROWSER_CHANNEL=chrome pnpm run test:browser`: **9 cases passed**: loading, profile-context, cohesion, planning, drafts, account, discovery-ui, night-fit and product startup. Environment variable syntax depends on the shell; on PowerShell use `$env:PLANMATE_BROWSER_CHANNEL='chrome'`.
 - `pnpm run verify`: composes the same link/format, rule/server and browser checks. CI installs Playwright Chromium; local checks used installed Chrome. Screenshots are ignored under `test-results/`, with mobile/desktop layouts visually inspected.
-- `pnpm run check:pilot`: configuration-only Goa check made no billable requests; Places/events are false. Updated preview also reports unconfigured Google sign-in, maps and routes.
+- `pnpm run check:pilot`: configuration-only Goa check made no billable requests; Places/events are false. Local configuration also reports unconfigured Google sign-in, maps and routes.
 - Git exclusion checks confirm credentials, saved data/media, databases, backups, dependencies and browser artifacts remain excluded. No remote push or deployment was performed.
 
 Prepared CI has not run on a remote repository. Passing these checks does not prove every interaction, real venue suitability, current event inventory, deployed HTTPS or live identity-provider behavior.
 
 ## Try it
 
-1. Start `pnpm start`, then open [the dashboard](http://localhost:3000/dashboard.html). Use **Create a trip** or **Join with an invitation**. The preview's sample members are demonstrations.
+1. Start `pnpm start`, then open [the dashboard](http://localhost:3000/dashboard.html). Use **Create a trip**, **Join with an invitation** or **Open your saved trips**. Enter a name, destination, dates and your own whole-trip budget. A new trip starts with its organizer and no stops or suggestions.
 2. In **Dates & attendance**, add a 22:00–02:00 option and select **Ends next day**. Members answer suitable windows. The organizer explicitly chooses the final date; attendance remains separate.
 3. In **Plans that fit**, type preferences, move focus away, and have a second browser change the trip. Unsaved fields remain. Reload to try **Restore/Discard**. Save required categories and supplied estimates, generate alternatives, vote, and review/apply explicitly.
 4. Use **Our itinerary** for schedule/map/reorder preview and undo; **Today's plan** for overnight continuation and group visits; **Actual expenses** for bills/repayments; **Our scrapbook** for own JPEG/PNG memories. The bottom-left name opens the separate profile page.
@@ -63,4 +65,4 @@ Prepared CI has not run on a remote repository. Passing these checks does not pr
 
 Live events remain deferred until a real provider is configured. The adapter preserves actual dates, fixed starts and source/ticket links. No fabricated event inventory, prices, opening hours, coordinates or route times were added.
 
-The default Playwright Chromium download is absent on this workstation, and the local sandbox blocks browser process launches. Browser checks used installed Chrome with execution approval and disposable test contexts. The original eight cases passed; after the mobile changes, the new demo case and complete cohesion case passed. CI still installs its own Chromium. No failed product checks remain; real provider credentials and public deployment are the remaining external checks.
+The default Playwright Chromium download is absent on this workstation, and the local sandbox blocks browser process launches. Browser checks use installed Chrome with execution approval and disposable test contexts. CI installs its own Chromium. Real provider credentials and public deployment need validation on the actual hosted environment.

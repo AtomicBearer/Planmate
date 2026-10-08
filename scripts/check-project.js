@@ -20,6 +20,7 @@ const dependencies = {
         "expense-rules.js",
     ],
     "planner-core.js": ["planning-rules.js"],
+    "planning-spaces.js": ["planner-core.js"],
     "group-planning.js": [
         "planner-ui.js",
         "browser-utils.js",
@@ -44,6 +45,7 @@ const dependencies = {
         "form-drafts.js",
         "browser-utils.js",
         "planner-core.js",
+        "planning-spaces.js",
         "catalogue.js",
         "profile-store.js",
         "itinerary-export.js",

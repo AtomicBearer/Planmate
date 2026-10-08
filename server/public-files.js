@@ -2,9 +2,6 @@
 
 // Explicit browser allowlist: never expose server code, credentials or saved data.
 module.exports = Object.freeze([
-    "demo.html",
-    "css/demo.css",
-    "js/demo.js",
     "login.html",
     "css/login.css",
     "js/login.js",
@@ -28,6 +25,7 @@ module.exports = Object.freeze([
     "js/account-client.js",
     "js/form-drafts.js",
     "shared/planner-core.js",
+    "js/planning-spaces.js",
     "shared/planning-rules.js",
     "shared/group-fit.js",
     "shared/planning-time.js",

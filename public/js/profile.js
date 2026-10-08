@@ -497,7 +497,7 @@
     const account = window.PlanmateAccount.account();
     $("accountBanner").innerHTML = account
         ? `Signed in as ${escape(account.name)} · Private profile syncs across devices. <button type="button" class="text-button" id="importLocalProfile">Copy local travel preferences into this form</button><button type="button" class="text-button" data-account-action="signout-all">Sign out on all devices</button>`
-        : `Local demo profile · saved on this browser only.${window.PlanmateAccount.error() ? " " + escape(window.PlanmateAccount.error()) : ""}`;
+        : `Saved on this device only · <a href="login.html?${escape(returnParams.toString())}">Sign in to access your profile across devices</a>${window.PlanmateAccount.error() ? " · " + escape(window.PlanmateAccount.error()) : ""}`;
     if (account)
         $("importLocalProfile").onclick = () => {
             draft = { ...P.localProfile(), name: saved.name };

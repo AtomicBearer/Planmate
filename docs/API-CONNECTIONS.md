@@ -1,12 +1,12 @@
 # Planmate API connection guide
 
-This is the configuration map for the hackathon release. At this review, there is no local `.env`: Google sign-in, Places/photos, Static Maps, routes and live events are **unconfigured**. Adapter tests use fixtures; they do not prove real credentials work. No keys are needed for Planmate's shared planning rules, recommendations, expense arithmetic or PDF export.
+This is the configuration map for the release. At this review, there is no local `.env`: Google sign-in, Places/photos, Static Maps, routes and live events are **unconfigured**. Adapter tests use fixtures; they do not prove real credentials work. No keys are needed for Planmate's shared planning rules, recommendations, expense arithmetic or PDF export.
 
 Keep credentials in a private `.env` locally or the hosting platform's server environment. Never put them in `public/`, commit them, or paste them into chat. Restart the server after changing environment variables.
 
 ## What connects where
 
-Paths below are relative to the project root. The demo guide at `/demo.html` displays the current server's configuration without exposing keys or calling paid services.
+Paths below are relative to the project root. The diagnostic endpoint `/api/integrations/status` reports configuration without exposing keys or calling paid services.
 
 | Feature / where to try it                                                            | Server setting                                                                  | Code to inspect                                                                           | External connection                                                                        | Current local state                           |
 | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------- |
@@ -23,7 +23,7 @@ Internal APIs are on the **same Node origin**: `/api/auth/*`, `/api/profile`, `/
 
 ## 1. Connect Places and photos first
 
-This supplies the most visible live-data improvement during a demo.
+This supplies live venue discovery and real photos.
 
 1. Create/select a Google Cloud project, attach billing and enable **Places API (New)**. Create a server API key and restrict it to that API. Apply suitable server/IP restrictions for the deployment. A browser-referrer-only key is inappropriate for these server calls. Follow [Google's Places setup](https://developers.google.com/maps/documentation/places/web-service/get-api-key).
 2. Set `GOOGLE_PLACES_API_KEY`. This is an API key, not the Google OAuth client ID.
@@ -38,9 +38,9 @@ Create a **Web application OAuth client** in Google Auth Platform and configure 
 
 Register the exact public HTTPS origin under Authorized JavaScript origins, without `/login.html` or another path. For local testing register both `http://localhost` and `http://localhost:3000`. This app uses a JavaScript callback; do not invent a redirect receiver endpoint. Follow [Google's Identity setup](https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid).
 
-For public accounts set `PUBLIC_ORIGIN=https://your-actual-domain`, `SESSION_SECURE=true` and `ACCOUNT_MODE=required`. Demo mode can remain enabled for a clearly labelled hackathon demonstration, but demo names are unverified and their profiles do not follow them across devices.
+For public accounts set `PUBLIC_ORIGIN=https://your-actual-domain`, `SESSION_SECURE=true` and `ACCOUNT_MODE=required`. Guest mode supports device-only details; those names are unverified and their profiles do not follow them across devices.
 
-Test sign-in with your actual Google account, reload, open a second browser/device, and verify the profile and protected trip membership follow that account. Test sign-out, invitation join and a stale profile save. If the button/popup fails, check the exact origin and client type, consent/audience settings, browser popup/network restrictions and the SDK network request. The server now sends a cross-origin-compatible referrer policy and popup policy; Google still requires its own origin configuration. Local HTTP behavior may vary; test the final HTTPS origin before the presentation.
+Test sign-in with your actual Google account, reload, open a second browser/device, and verify the profile and protected trip membership follow that account. Test sign-out, invitation join and a stale profile save. If the button/popup fails, check the exact origin and client type, consent/audience settings, browser popup/network restrictions and the SDK network request. The server now sends a cross-origin-compatible referrer policy and popup policy; Google still requires its own origin configuration. Local HTTP behavior may vary; test the final HTTPS origin before publishing.
 
 ## 3. Connect map backgrounds
 
@@ -76,7 +76,7 @@ The feed must return `durationSeconds` (0–86400), `distanceMeters` (0–200000
 
 The [README event contract](../README.md#connect-city-events) defines the required query parameters, dates, source/ticket links, rights and JSON shape. `EVENTS_FEED_URL` must be a real authorized provider/organizer endpoint transformed to that contract. BookMyShow/District website URLs are not API feed URLs. Planmate includes no ticket-site scraping.
 
-Alternatively configure a [Ticketmaster Discovery API key](https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/). A configured city feed takes precedence. Check actual India/city inventory before presenting; an empty result does not prove no events exist. Published event dates and fixed start times are preserved. Keeping this optional provider unconfigured does not block the planning demo.
+Alternatively configure a [Ticketmaster Discovery API key](https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/). A configured city feed takes precedence. Check actual India/city inventory before publishing; an empty result does not prove no events exist. Published event dates and fixed start times are preserved. Keeping this optional provider unconfigured does not block the planning features.
 
 ## Connections that do not need API keys
 
@@ -84,6 +84,6 @@ Alternatively configure a [Ticketmaster Discovery API key](https://developer.tic
 
 ## Public-link diagnosis
 
-Run `pnpm run check:launch` after setting the public deployment environment. It checks host binding, origin, cookie settings, data path, feed URLs and optional service settings without printing credential values or contacting providers. See [the hackathon/public deployment checklist](HACKATHON.md).
+Run `pnpm run check:launch` after setting the public deployment environment. It checks host binding, origin, cookie settings, data path, feed URLs and optional service settings without printing credential values or contacting providers. See [the public deployment checklist](DEPLOYMENT.md).
 
 If HTML works but `/api/*` fails, deploy the **Node app**, not only `public/`, and proxy pages plus API to the same origin. Preserve the incoming Host header. For errors joining/saving, check the chosen account mode, cookies, membership and revision; refreshing is deliberate after a stale edit. Missing scrapbook images after a restart usually mean the host's disk was ephemeral or media was not restored with its database. Never overwrite the database to “fix” an API issue.

@@ -21,6 +21,9 @@
     padding: 0;
     box-sizing: border-box;
 }
+[hidden] {
+    display: none !important;
+}
 body {
     min-height: 100vh;
     font-family: var(--font-hand);

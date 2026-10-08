@@ -5,13 +5,13 @@ function describeIntegrations({ accounts, discovery, maps }) {
     return {
         checkedAt: new Date().toISOString(),
         liveVerified: false,
-        accountMode: accounts.required ? "Verified accounts required" : "Demo access enabled",
+        accountMode: accounts.required ? "Verified accounts required" : "Guest access enabled",
         services: [
             {
                 id: "accounts",
                 name: "Google sign-in",
                 configured: accounts.configured,
-                fallback: "Unverified demo profiles stay on this browser.",
+                fallback: "Device profiles stay on this browser and do not verify an account.",
             },
             {
                 id: "places",

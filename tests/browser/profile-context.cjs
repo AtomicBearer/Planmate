@@ -19,8 +19,8 @@ const { createPlannerServer } = require("../server-fixture");
         await page.locator("#email").fill("maya@example.test");
         assert.equal(await page.locator('[type="password"], #rememberMe, a[href="#"]').count(), 0);
         assert.match(
-            await page.locator(".prototype-note").innerText(),
-            /Local demo details stay on this browser/,
+            await page.locator(".device-note").innerText(),
+            /These details stay on this device/,
         );
         await page.screenshot({
             path: path.join("test-results", "login-audit-desktop.png"),
@@ -82,7 +82,7 @@ const { createPlannerServer } = require("../server-fixture");
         );
         assert.deepEqual(errors, []);
         console.log(
-            "PASS: local profile entry, truthful prototype state, no dead login controls, preserved profile return context, wishlist query composition, rejected malformed context, and 320px login layout.",
+            "PASS: device profile entry, clear storage scope, working login controls, preserved profile return context, wishlist query composition, rejected malformed context, and 320px login layout.",
         );
         await context.close();
     } finally {

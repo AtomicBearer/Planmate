@@ -103,7 +103,7 @@
                 ) +
                     (!a.groupCode()
                         ? notice(
-                              "Photo uploads need a shared server trip. Visited-stop memories and notes remain visible in this browser preview.",
+                              "Create a shared trip to add photos with your friends. Your visited stops and notes remain saved on this device.",
                           )
                         : notice(
                               "JPEG or PNG · up to 5 MB each · up to 100 photos per trip. Visible only with trip membership; authors control their photos and captions.",

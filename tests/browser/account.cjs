@@ -39,6 +39,7 @@ const { createPlannerServer } = require("../server-fixture");
         await host.p.goto(base + "/dashboard.html");
         await host.p.getByRole("button", { name: "Create a trip", exact: true }).click();
         await host.p.locator("[name=title]").fill("Account UI trip");
+        await host.p.locator("[name=budget]").fill("5000");
         await host.p.getByRole("button", { name: "Create planning space", exact: true }).click();
         await host.p.getByRole("heading", { name: "Account UI trip", exact: true }).waitFor();
         await host.p.getByRole("button", { name: "Invite friends", exact: true }).click();

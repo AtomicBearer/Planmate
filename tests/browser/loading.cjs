@@ -13,7 +13,7 @@ const { createPlannerServer } = require("../server-fixture");
             body: JSON.stringify({
                 name: "Host",
                 trip: {
-                    title: "Actual trip, not the demo",
+                    title: "Our shared trip",
                     city: "Goa",
                     start: "2026-10-09",
                     end: "2026-10-11",
@@ -40,7 +40,7 @@ const { createPlannerServer } = require("../server-fixture");
         assert.equal(await page.locator('#sideNav [data-view="ideas"]').isDisabled(), true);
         await page.locator('[data-form="join"] [name="name"]').fill("Friend");
         await page.getByRole("button", { name: "Join the planning space", exact: true }).click();
-        await page.getByRole("heading", { name: "Actual trip, not the demo" }).waitFor();
+        await page.getByRole("heading", { name: "Our shared trip" }).waitFor();
         assert.equal(await page.locator("#sideNav .active").getAttribute("data-view"), "group");
         assert.equal(await page.locator('#sideNav [data-view="ideas"]').isDisabled(), false);
         await page.getByText("Unanswered: Host, Friend", { exact: true }).waitFor();
@@ -50,16 +50,16 @@ const { createPlannerServer } = require("../server-fixture");
         await page.goto(base + "/dashboard.html?group=" + g.code);
         await page
             .getByText(
-                "The shared planning server is unavailable. Start it at this address, then reload to open the group.",
+                "We couldn’t open the shared trip. Check your connection and reload to try again.",
             )
             .waitFor();
         assert.equal(await page.locator(".hero").isVisible(), false);
         await page.getByRole("link", { name: "Open my browser plans" }).click();
-        await page.getByRole("heading", { name: "Goa, here we come" }).waitFor();
+        await page.getByRole("heading", { name: "Your next adventure starts here" }).waitFor();
         assert.equal(await page.locator('#sideNav [data-view="ideas"]').isDisabled(), false);
         assert.deepEqual(errors, []);
         console.log(
-            "PASS: shared loading never displays sample trip, fresh invite join starts at dates/attendance without marking attendance, unavailable server is explicit with usable local fallback",
+            "PASS: shared loading never displays another trip, fresh invite join starts at dates/attendance without marking attendance, connection errors retain access to device plans",
         );
         await context.close();
     } finally {

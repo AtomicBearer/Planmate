@@ -205,7 +205,7 @@ function createPlannerServer({
                 if (url.pathname === "/api/health" && request.method === "GET")
                     return json(response, 200, {
                         ok: true,
-                        mode: accounts.required ? "accounts-required" : "local-demo",
+                        mode: accounts.required ? "accounts-required" : "guest",
                         storage: "sqlite-single-host",
                         verifiedSignInConfigured: accounts.configured,
                         planningFeatures: 2,
@@ -256,7 +256,10 @@ function createPlannerServer({
                     const user = accounts.session(request);
                     if (user || accounts.required) accounts.csrf(request, user);
                     if (Object.keys(database.groups).length >= 100)
-                        fail(400, "This prototype supports up to 100 shared trips.");
+                        fail(
+                            400,
+                            "The shared trip limit has been reached. Contact the site administrator.",
+                        );
                     const name = Core.text(value.name, "Name", 60),
                         code = crypto.randomBytes(12).toString("base64url");
                     const token = crypto.randomBytes(32).toString("base64url"),

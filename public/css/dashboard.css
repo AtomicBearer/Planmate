@@ -12,6 +12,9 @@
     display: none;
     text-decoration: none;
 }
+.top-actions .mobile-trip-switch {
+    display: none;
+}
 .avatar.profile-colour-terracotta {
     background: #dfb69d;
     color: #79553d;
@@ -1457,14 +1460,6 @@ dialog::backdrop {
     border-radius: 9px;
     margin: 15px 0;
     font-size: 12px;
-}
-.preview-selector {
-    width: 100%;
-    padding: 11px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--white);
-    margin-top: 12px;
 }
 .toast {
     position: fixed;
