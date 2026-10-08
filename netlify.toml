@@ -1,0 +1,8 @@
+# Optional Git build of the same personal-planning files used for folder uploads.
+# This is a static release: the complete Node backend remains in server/.
+[build]
+command = "pnpm run build:netlify"
+publish = "output/netlify"
+
+[build.environment]
+NODE_VERSION = "24.19.0"

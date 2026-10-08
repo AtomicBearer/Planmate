@@ -1,0 +1,36 @@
+{
+    "name": "planmate-dashboard",
+    "version": "1.0.0",
+    "private": true,
+    "description": "A warm, collaborative itinerary planner for trips across India",
+    "engines": {
+        "node": ">=24.13"
+    },
+    "scripts": {
+        "start": "node --env-file-if-exists=.env server.js",
+        "start:lan": "node --env-file-if-exists=.env server.js --lan",
+        "build:netlify": "node scripts/build-netlify.js",
+        "test": "node --test --test-isolation=none tests/*.test.js",
+        "check:links": "node scripts/check-project.js",
+        "check": "node scripts/check-project.js && prettier --check .",
+        "format": "prettier --write .",
+        "prepare:pdf": "node scripts/prepare-pdf-assets.js",
+        "prepare:fonts": "node scripts/prepare-web-fonts.js",
+        "test:browser": "node tests/browser/run.cjs",
+        "verify": "pnpm run check && pnpm test && pnpm run test:browser",
+        "check:pilot": "node --env-file-if-exists=.env scripts/pilot-goa.js",
+        "check:launch": "node --env-file-if-exists=.env scripts/check-launch.js"
+    },
+    "devDependencies": {
+        "@pdf-lib/fontkit": "1.1.1",
+        "pdf-lib": "1.17.1",
+        "playwright": "1.63.0",
+        "prettier": "3.6.2",
+        "regenerator-runtime": "0.14.1"
+    },
+    "dependencies": {
+        "google-auth-library": "11.1.0",
+        "sharp": "0.35.5"
+    },
+    "packageManager": "pnpm@11.25.0"
+}

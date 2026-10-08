@@ -1,0 +1,4 @@
+# Keep the same dependency layout in local shells and CI.
+enableGlobalVirtualStore: false
+# Dependency installation is explicit; running checks must not rebuild node_modules.
+verifyDepsBeforeRun: false

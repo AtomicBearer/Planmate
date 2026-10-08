@@ -1,0 +1,12 @@
+node_modules/
+.pnpm-store/
+test-results/
+data/
+.qa/
+.env*
+pnpm-lock.yaml
+public/assets/vendor/
+public/assets/pdf-fonts.js
+tmp/
+output/
+licenses/pdf-export/

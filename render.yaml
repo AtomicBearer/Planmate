@@ -1,0 +1,30 @@
+# GitHub-connected Node deployment. This uses a PAID service and persistent disk.
+# Review current pricing before deploying; see docs/DEPLOYMENT.md.
+services:
+    - type: web
+      name: planmate
+      runtime: node
+      region: singapore
+      plan: 0.5c-512mb
+      numInstances: 1
+      buildCommand: npm install --global pnpm@11.25.0 && pnpm install --frozen-lockfile && pnpm run check && pnpm test
+      startCommand: pnpm run check:launch && pnpm start
+      healthCheckPath: /api/health
+      autoDeployTrigger: checksPass
+      disk:
+          name: planmate-data
+          mountPath: /var/data
+          sizeGB: 3
+      envVars:
+          - key: NODE_VERSION
+            value: 24.19.0
+          - key: NODE_ENV
+            value: production
+          - key: HOST
+            value: 0.0.0.0
+          - key: ACCOUNT_MODE
+            value: guest
+          - key: SESSION_SECURE
+            value: "true"
+          - key: PLANMATE_DATA_DIR
+            value: /var/data/planmate
