@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#f8f5ef" />
+        <title>Planmate | Your travel profile</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Patrick+Hand&family=Permanent+Marker&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="shared.css" />
+        <link rel="stylesheet" href="dashboard.css" />
+        <link rel="stylesheet" href="dashboard-responsive.css" />
+        <link rel="stylesheet" href="profile.css" />
+        <link rel="stylesheet" href="personality.css" />
+        <script src="browser-utils.js" defer></script>
+        <script src="account-client.js" defer></script>
+        <script src="catalogue.js" defer></script>
+        <script src="profile-rules.js" defer></script>
+        <script src="profile-store.js" defer></script>
+        <script src="profile.js" defer></script>
+        <script src="motion.js" defer></script>
+    </head>
+    <body class="profile-page">
+        <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <symbol id="p-arrow" viewBox="0 0 24 24"><path d="M20 12H4m6-6-6 6 6 6" /></symbol>
+            <symbol id="p-pin" viewBox="0 0 24 24">
+                <path d="M19 9c0 6-7 12-7 12S5 15 5 9a7 7 0 0 1 14 0z" />
+                <circle cx="12" cy="9" r="2" />
+            </symbol>
+            <symbol id="p-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+            <symbol id="p-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></symbol>
+            <symbol id="p-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></symbol>
+            <symbol id="p-heart" viewBox="0 0 24 24">
+                <path d="M20 5a5 5 0 0 0-8 1 5 5 0 0 0-8-1c-4 4 1 9 8 15 7-6 12-11 8-15z" />
+            </symbol>
+            <symbol id="p-beach" viewBox="0 0 24 24">
+                <path
+                    d="M3 11a9 9 0 0 1 18 0c-3-2-4-2-6 0-2-2-4-2-6 0-2-2-3-2-6 0zM12 11v8a2 2 0 0 0 4 0M3 22h18"
+                />
+            </symbol>
+            <symbol id="p-food" viewBox="0 0 24 24">
+                <path d="M4 3v6a3 3 0 0 0 6 0V3M7 3v18M19 21V3c-4 0-4 10 0 10" />
+            </symbol>
+            <symbol id="p-music" viewBox="0 0 24 24">
+                <path d="M9 18V5l11-2v13M9 8l11-2" />
+                <ellipse cx="6" cy="18" rx="3" ry="2" />
+                <ellipse cx="17" cy="16" rx="3" ry="2" />
+            </symbol>
+            <symbol id="p-sights" viewBox="0 0 24 24">
+                <path d="m3 9 9-6 9 6zM5 9v11M10 9v11M14 9v11M19 9v11M3 21h18" />
+            </symbol>
+            <symbol id="p-leaf" viewBox="0 0 24 24">
+                <path d="M4 20C1 6 10 3 21 3c0 12-6 19-17 17zM4 20 16 8" />
+            </symbol>
+            <symbol id="p-calendar" viewBox="0 0 24 24">
+                <rect x="3" y="5" width="18" height="16" rx="3" />
+                <path d="M7 3v4M17 3v4M3 11h18M8 15h2M14 15h2" />
+            </symbol>
+            <symbol id="p-route" viewBox="0 0 24 24">
+                <circle cx="5" cy="5" r="2" />
+                <circle cx="19" cy="19" r="2" />
+                <path d="M5 7v7a4 4 0 0 0 4 4h3M19 17v-7a4 4 0 0 0-4-4h-3" />
+            </symbol>
+            <symbol id="p-bag" viewBox="0 0 24 24">
+                <path d="M5 8h14l2 13H3zM8 8V6a4 4 0 0 1 8 0v2" />
+            </symbol>
+        </svg>
+        <a class="skip-link" href="#profileMain">Skip to profile</a>
+        <header class="profile-topbar"
+            ><a class="brand" href="dashboard.html" id="profileBrand"
+                >Plan<span>mate</span><span class="brand-star">✦</span></a
+            ><a class="button secondary" id="backToPlan" href="dashboard.html"
+                ><svg aria-hidden="true"><use href="#p-arrow" /></svg>Back to my plan</a
+            ></header
+        >
+        <div id="accountBanner" class="plan-notice" role="status">Loading your profile…</div>
+        <main id="profileMain" class="profile-main">
+            <section class="profile-intro"
+                ><div
+                    ><span class="eyebrow">YOUR PEOPLE. YOUR PLACES. YOUR KIND OF ADVENTURE.</span
+                    ><h1>A little more you<span>✧</span></h1
+                    ><p
+                        >The things you love, the places you’re dreaming of, and what makes a trip
+                        feel like yours. Saved on this browser; copy preferences into a trip when
+                        you choose to share them.</p
+                    ></div
+                ><div class="profile-artwork" aria-hidden="true"
+                    ><span class="graffiti-tag">made of<br /><em>little adventures.</em></span
+                    ><svg class="profile-doodle" viewBox="0 0 200 140" aria-hidden="true">
+                        <circle cx="132" cy="70" r="60" fill="#ece1ce" stroke="none" />
+                        <path
+                            d="m52 43 88-15 16 87-88 16z"
+                            fill="#fffaf0"
+                            stroke="#aa9070"
+                            stroke-width="2"
+                        />
+                        <path
+                            d="m69 66 43-7m-40 20 60-11m-57 26 35-6"
+                            stroke="#c7b18e"
+                            stroke-width="3"
+                        />
+                        <path d="m135 39 25-24-6 22-8-1-11 3z" fill="#d8c3a3" stroke="#9b805e" />
+                        <path
+                            d="M18 50q-3-44 57-39"
+                            stroke="#b5a087"
+                            stroke-dasharray="4 5"
+                            fill="none"
+                        />
+                        <path d="m30 99 7-8 7 8-7 9z" fill="#a7b294" stroke="none" />
+                        <path
+                            d="m162 105 4-10 4 10 10 4-10 4-4 10-4-10-10-4z"
+                            fill="#b09874"
+                            stroke="none"
+                        /></svg></div
+            ></section>
+            <form id="profileForm" inert aria-busy="true">
+                <div class="profile-grid">
+                    <aside class="identity-card" aria-label="Your profile summary">
+                        <div class="profile-avatar terracotta" id="identityAvatar">Y</div>
+                        <fieldset class="avatar-colours"
+                            ><legend class="visually-hidden">Choose your avatar colour</legend
+                            ><div id="avatarColours"></div
+                        ></fieldset>
+                        <span class="tiny-label">THE PERSON BEHIND THE PLAN</span
+                        ><h2 id="identityName">You</h2
+                        ><p id="identityCity" class="identity-city">Where’s home for you?</p
+                        ><p id="identityBio" class="identity-bio"
+                            >A few words about your kind of adventure.</p
+                        >
+                        <dl class="profile-stats"
+                            ><div><dt>Cities to visit</dt><dd id="wishCount">0</dd></div
+                            ><div><dt>Places visited</dt><dd id="visitedCount">0</dd></div
+                            ><div><dt>Interests</dt><dd id="interestCount">0</dd></div></dl
+                        >
+                        <div class="travel-personality"
+                            ><span class="tiny-label">YOUR TRAVEL RHYTHM</span
+                            ><p id="paceSummary">A little of everything</p></div
+                        ><p class="identity-note"
+                            >Your next favourite memory<br />is still out there. ⤴</p
+                        >
+                        <a class="profile-jump" href="#cityWishlist">My city wishlist ↓</a>
+                    </aside>
+                    <div class="profile-sections">
+                        <section class="profile-panel" aria-labelledby="aboutHeading"
+                            ><div class="profile-section-heading"
+                                ><span class="section-number">01</span
+                                ><div
+                                    ><h2 id="aboutHeading">Hello, that’s me</h2
+                                    ><p>A little introduction for your next adventure.</p></div
+                                ></div
+                            ><div class="form-row">
+                                <label class="form-field"
+                                    ><span>What should we call you?</span
+                                    ><input
+                                        id="displayName"
+                                        name="name"
+                                        maxlength="60"
+                                        required
+                                        autocomplete="name"
+                                        placeholder="Your name" /></label
+                                ><label class="form-field"
+                                    ><span>Home city</span
+                                    ><input
+                                        id="homeCity"
+                                        name="homeCity"
+                                        maxlength="60"
+                                        list="profileCityNames"
+                                        autocomplete="address-level2"
+                                        placeholder="Where your adventures start" /></label></div
+                            ><label class="form-field"
+                                ><span>A little about you</span
+                                ><textarea
+                                    id="travelBio"
+                                    name="bio"
+                                    maxlength="300"
+                                    rows="3"
+                                    placeholder="Usually chasing sunsets, good food, and a story worth telling…"
+                                ></textarea
+                                ><small id="bioCount">0 / 300</small></label
+                            ><div id="accountDetails" class="account-details" hidden></div
+                        ></section>
+                        <section class="profile-panel" aria-labelledby="hobbiesHeading"
+                            ><div class="profile-section-heading"
+                                ><span class="section-number">02</span
+                                ><div
+                                    ><h2 id="hobbiesHeading">Things that make me, me</h2
+                                    ><p>Pick your hobbies. Add anything we’ve missed.</p></div
+                                ></div
+                            ><fieldset class="choice-fieldset"
+                                ><legend class="visually-hidden">Your hobbies</legend
+                                ><div class="hobby-choices" id="hobbyChoices"></div></fieldset
+                            ><div class="add-interest"
+                                ><label class="visually-hidden" for="customHobby"
+                                    >Add another hobby</label
+                                ><input
+                                    id="customHobby"
+                                    maxlength="35"
+                                    placeholder="Another thing you love…"
+                                /><button type="button" class="button secondary" id="addHobby"
+                                    ><svg aria-hidden="true"><use href="#p-plus" /></svg>Add
+                                    hobby</button
+                                ></div
+                            ><p class="field-feedback" id="hobbyFeedback" role="status"></p
+                        ></section>
+                        <section class="profile-panel" aria-labelledby="placesHeading"
+                            ><div class="profile-section-heading"
+                                ><span class="section-number">03</span
+                                ><div
+                                    ><h2 id="placesHeading">My kind of places</h2
+                                    ><p>What usually makes you say “let’s go there”?</p></div
+                                ></div
+                            ><fieldset class="choice-fieldset"
+                                ><legend class="visually-hidden"
+                                    >Types of places you like to visit</legend
+                                ><div
+                                    class="place-preferences"
+                                    id="placePreferences"
+                                ></div></fieldset
+                        ></section>
+                        <section class="profile-panel" aria-labelledby="styleHeading"
+                            ><div class="profile-section-heading"
+                                ><span class="section-number">04</span
+                                ><div
+                                    ><h2 id="styleHeading">How I like to travel</h2
+                                    ><p>Everyone has a rhythm. Here’s yours.</p></div
+                                ></div
+                            ><div class="form-row"
+                                ><label class="form-field"
+                                    ><span>My ideal pace</span
+                                    ><select id="travelPace" name="pace"></select></label
+                                ><label class="form-field"
+                                    ><span>My budget style</span
+                                    ><select id="budgetStyle" name="budget"></select></label></div
+                            ><div class="form-row"
+                                ><label class="form-field"
+                                    ><span>I love travelling with</span
+                                    ><select id="travelCompany" name="company"></select></label
+                                ><label class="form-field"
+                                    ><span>My favourite time to explore</span
+                                    ><select id="exploreTime" name="time"></select></label></div
+                        ></section>
+                        <section
+                            class="profile-panel wishlist-panel"
+                            id="cityWishlist"
+                            aria-labelledby="wishlistHeading"
+                            ><div class="profile-section-heading"
+                                ><span class="section-number">05</span
+                                ><div
+                                    ><h2 id="wishlistHeading">Someday starts here</h2
+                                    ><p
+                                        >Your wishlist of future cities. Big trips, little escapes,
+                                        all welcome.</p
+                                    ></div
+                                ><span class="wishlist-total" id="wishlistTotal"
+                                    >0 cities</span
+                                ></div
+                            ><div class="wishlist-add"
+                                ><label class="form-field"
+                                    ><span>A city you’re dreaming of</span
+                                    ><input
+                                        id="wishCity"
+                                        maxlength="60"
+                                        list="profileCityNames"
+                                        placeholder="e.g. Udaipur, Kochi, Shillong…" /></label
+                                ><button type="button" class="button primary" id="addWish"
+                                    ><svg aria-hidden="true"><use href="#p-plus" /></svg>Add
+                                    city</button
+                                ></div
+                            ><p class="field-feedback" id="wishlistFeedback" role="status"></p
+                            ><div id="wishlistCards"></div
+                            ><div id="wishlistSuggestions" class="wishlist-suggestions"></div
+                        ></section>
+                    </div>
+                </div>
+                <div class="profile-error" id="profileError" role="alert" hidden></div>
+                <div class="profile-savebar"
+                    ><div
+                        ><span class="save-indicator" id="saveIndicator"></span
+                        ><p id="profileSaveStatus" role="status" aria-live="polite"
+                            >Your profile is saved on this browser</p
+                        ></div
+                    ><div class="savebar-actions"
+                        ><button type="button" class="button secondary" id="discardChanges" disabled
+                            >Discard changes</button
+                        ><button type="submit" class="button primary" id="saveProfile"
+                            ><svg aria-hidden="true"><use href="#p-check" /></svg>Save my
+                            profile</button
+                        ></div
+                    ></div
+                >
+            </form>
+            <datalist id="profileCityNames"></datalist>
+            <p class="profile-footer">Collect places. Make memories. Be yourself. ✧</p>
+        </main>
+        <dialog id="discardDialog" aria-labelledby="discardTitle"
+            ><div class="dialog-inner"
+                ><div class="dialog-header"
+                    ><div
+                        ><h2 id="discardTitle">Keep your last saved profile?</h2
+                        ><p>This will undo the edits you haven’t saved.</p></div
+                    ></div
+                ><div class="dialog-actions"
+                    ><button type="button" class="button secondary" id="keepEditing"
+                        >Keep editing</button
+                    ><button type="button" class="button primary" id="confirmDiscard"
+                        >Discard edits</button
+                    ></div
+                ></div
+            ></dialog
+        >
+        <div class="toast" id="profileToast" role="status" aria-live="polite"></div>
+        <noscript
+            ><p class="noscript"
+                >Enable JavaScript to edit and save your travel profile.</p
+            ></noscript
+        >
+    </body>
+</html>

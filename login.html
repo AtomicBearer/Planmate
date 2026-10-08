@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+
+        <!-- Makes the page responsive on mobile devices -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Planmate | Start planning</title>
+
+        <!-- Patrick Hand font -->
+        <link
+            href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Permanent+Marker&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Our CSS -->
+        <link rel="stylesheet" href="shared.css" />
+        <link rel="stylesheet" href="login.css" />
+        <link rel="stylesheet" href="personality.css" />
+        <script src="motion.js" defer></script>
+        <script src="account-client.js" defer></script>
+
+        <!--
+        Google Identity Services library.
+        Server-verified Google sign-in; configured client ID is loaded from the server.
+    -->
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+    </head>
+
+    <body>
+        <main class="login-page">
+            <!-- ==============================
+             LEFT SIDE - PRODUCT INFORMATION
+        ================================= -->
+            <section class="welcome-panel">
+                <div class="logo"> Plan<span>mate</span> </div>
+
+                <div class="welcome-content">
+                    <span class="mini-label"> ✦ Planning made simple </span>
+
+                    <h1>
+                        <span class="marker-line">Make plans.</span><br />
+                        Not endless chats.
+                    </h1>
+
+                    <p>
+                        Bring your group together, suggest ideas, vote, split expenses and turn
+                        conversations into actual plans.
+                    </p>
+
+                    <div class="welcome-art" aria-hidden="true">
+                        <span class="graffiti-tag"
+                            >less scrolling.<br /><em>more stories.</em></span
+                        >
+                        <img
+                            class="welcome-doodles"
+                            src="assets/travel-doodles.svg"
+                            alt=""
+                            width="125"
+                            height="80"
+                        />
+                        <span class="paper-sticker sage">let’s go ↗</span>
+                    </div>
+                    <!-- Small visual demo -->
+                    <div class="plan-preview">
+                        <div class="preview-top">
+                            <div>
+                                <small>Example plan</small>
+                                <h3>Weekend Hangout 🎉</h3>
+                            </div>
+
+                            <span class="status"> Choosing a date </span>
+                        </div>
+
+                        <div class="preview-members">
+                            <div class="avatars">
+                                <span>A</span>
+                                <span>R</span>
+                                <span>S</span>
+                                <span>+3</span>
+                            </div>
+
+                            <p>6 friends planning together</p>
+                        </div>
+
+                        <div class="progress-title">
+                            <span>Availability responses</span>
+                            <strong>5 of 6</strong>
+                        </div>
+
+                        <div class="progress-bar">
+                            <div class="progress"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="footer-note"> Dates → Ideas → Itinerary → Confirm together </p>
+            </section>
+
+            <!-- ==============================
+             RIGHT SIDE - LOGIN FORM
+        ================================= -->
+            <section class="form-section">
+                <div class="login-card">
+                    <span class="ink-stamp login-stamp" aria-hidden="true"
+                        >Good company club ✦</span
+                    >
+
+                    <div class="mobile-logo"> Plan<span>mate</span> </div>
+
+                    <div class="form-heading">
+                        <span class="handwritten-note"> Welcome 👋 </span>
+
+                        <h2>Make it yours</h2>
+
+                        <p>Sign in for your shared trips, or try a local demo.</p>
+                    </div>
+
+                    <!-- Server-configured verified sign-in -->
+
+                    <p id="accountStatus" role="status">Checking verified sign-in…</p>
+                    <div class="google-wrapper" id="googleSignIn"></div>
+                    <!-- Divider -->
+                    <div class="divider">
+                        <span></span>
+                        <p>or continue with details</p>
+                        <span></span>
+                    </div>
+
+                    <!-- =====================
+                     LOCAL PROFILE FORM
+                ====================== -->
+
+                    <form id="loginForm" novalidate>
+                        <!-- NAME -->
+                        <div class="form-group">
+                            <label for="fullName"> Full Name </label>
+
+                            <div class="input-container">
+                                <span class="input-icon"> ♡ </span>
+
+                                <input
+                                    type="text"
+                                    id="fullName"
+                                    name="fullName"
+                                    placeholder="Your full name"
+                                    autocomplete="name"
+                                    maxlength="60"
+                                    required
+                                />
+                            </div>
+
+                            <small class="error" id="nameError"></small>
+                        </div>
+
+                        <!-- EMAIL -->
+                        <div class="form-group">
+                            <label for="email"> Email Address </label>
+
+                            <div class="input-container">
+                                <span class="input-icon"> @ </span>
+
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    placeholder="you@example.com"
+                                    autocomplete="email"
+                                    maxlength="254"
+                                    required
+                                />
+                            </div>
+
+                            <small class="error" id="emailError"></small>
+                        </div>
+
+                        <!-- CONTACT -->
+                        <div class="form-group">
+                            <label for="contact"> Contact Number (optional) </label>
+
+                            <div class="input-container">
+                                <span class="input-icon"> ☎ </span>
+
+                                <input
+                                    type="tel"
+                                    id="contact"
+                                    name="contact"
+                                    placeholder="+91 98765 43210"
+                                    autocomplete="tel"
+                                    maxlength="30"
+                                />
+                            </div>
+
+                            <small class="error" id="contactError"></small>
+                        </div>
+
+                        <!-- SUBMIT BUTTON -->
+                        <button type="submit" class="primary-button" id="continueButton">
+                            Continue to Planmate
+
+                            <span>→</span>
+                        </button>
+                    </form>
+
+                    <p class="signup-text">
+                        Create a trip or join through a friend’s invitation on the dashboard.
+                    </p>
+
+                    <p class="privacy-note prototype-note">
+                        Local demo details stay on this browser. Server-verified Google sign-in
+                        enables account profiles and shared trip access when configured.
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <!-- =============================
+         TOAST MESSAGE
+    ============================== -->
+
+        <div class="toast" id="toast" role="status" aria-live="polite">
+            <span id="toastIcon"> ✓ </span>
+
+            <div>
+                <strong id="toastTitle"> Success </strong>
+
+                <p id="toastMessage"> You are ready to continue. </p>
+            </div>
+        </div>
+
+        <!-- Our JavaScript -->
+        <script src="login.js" defer></script>
+    </body>
+</html>

@@ -1,0 +1,2 @@
+# Keep checkout line endings consistent with EditorConfig and Prettier on Windows/CI.
+* text=auto eol=lf

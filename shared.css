@@ -1,0 +1,29 @@
+:root {
+    --background: #f8f5ef;
+    --white: #fffdf9;
+    --beige-light: #f1e9dd;
+    --beige: #e4d5c2;
+    --beige-dark: #c9aa87;
+    --brown: #8e6f52;
+    --brown-dark: #4e3b2c;
+    --text: #3e342c;
+    --muted-text: #6b5b4d;
+    --green: #69866c;
+    --error: #b94b4b;
+    --border: #ded2c3;
+    --radius: 18px;
+    --shadow: 0 5px 20px rgba(78, 59, 44, 0.035);
+    --font-hand: "Patrick Hand", "Segoe Print", cursive;
+    --font-body: "DM Sans", "Segoe UI", sans-serif;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    min-height: 100vh;
+    font-family: var(--font-hand);
+    background: var(--background);
+    color: var(--text);
+}

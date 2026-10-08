@@ -1,0 +1,19 @@
+/* Original category art; never presented as venue photographs. */
+(function () {
+    "use strict";
+    /* Original, locally rendered illustrations. They are category artwork, not venue photographs. */
+    function scene(type) {
+        const sky = `<rect width="400" height="190" fill="#e9ddc7"/><circle cx="308" cy="50" r="27" fill="#fff1c9"/><path d="M0 70q70-24 145-9t145-5 110-2" fill="none" stroke="#f6eddd" stroke-width="10"/>`;
+        const art = {
+            Beach: `${sky}<path d="M0 100q80-20 190 3t210-5v92H0" fill="#abc0b0"/><path d="M0 145q75-30 180-3t220-5v53H0" fill="#d3b990"/><path d="M0 117q100-15 205 3t195-8" fill="none" stroke="#d8e2cd" stroke-width="3"/><path d="M62 161q-8-49 10-99" stroke="#79684e" stroke-width="5" fill="none"/><path d="M71 63q-25-35-52-8 28-4 52 8m0 0q26-39 52-7-26-6-52 7m0 0q-31-7-42 23 21-18 42-23m0 0q28-5 42 21-23-16-42-21" fill="#758b68"/><path d="m277 158 29-32 29 32" stroke="#8c6f50" fill="#ecd6b7" stroke-width="2"/><path d="M306 125v45" stroke="#8c6f50" stroke-width="2"/>`,
+            Food: `<rect width="400" height="190" fill="#d6d8bb"/><rect x="43" y="39" width="267" height="131" rx="5" fill="#e8ccab"/><path d="M26 62h302l-18-35H43z" fill="#acb48e"/><path d="M58 62V30m37 32V30m37 32V30m37 32V30m37 32V30m37 32V30m37 32V30" stroke="#f0e3ca" stroke-width="16"/><rect x="73" y="87" width="55" height="54" rx="25" fill="#8b9f8b"/><rect x="160" y="87" width="55" height="80" rx="26" fill="#8e7e65"/><rect x="244" y="87" width="38" height="54" rx="19" fill="#8b9f8b"/><path d="M0 167h400v23H0" fill="#bdab90"/><path d="M310 168v-26m-17 0h34m-8 0 10 26" stroke="#795f47" stroke-width="3"/><circle cx="339" cy="114" r="22" fill="#93a382"/><path d="M339 167v-49" stroke="#795f47" stroke-width="4"/>`,
+            Nightlife: `<rect width="400" height="190" fill="#6d7062"/><circle cx="310" cy="44" r="22" fill="#dfd0a4"/><path d="M32 30q170 58 336 0" stroke="#d6c299" fill="none"/><path d="m68 40 2 13m54 0 2 12m54-1v14m53-14v13m56-24-1 14m47-28v12" stroke="#f4e1b2" stroke-width="6" stroke-linecap="round"/><rect x="59" y="97" width="280" height="74" rx="6" fill="#948871"/><rect x="89" y="80" width="219" height="20" rx="4" fill="#aa9680"/><path d="M115 110v54m43-54v54m43-54v54m43-54v54m43-54v54" stroke="#645e52" stroke-width="19"/><circle cx="201" cy="68" r="13" fill="#cdbb92"/><path d="M0 177h400" stroke="#b6a78b" stroke-width="26"/>`,
+            Sights: `${sky}<path d="M0 171h400v19H0" fill="#bbac8b"/><rect x="74" y="88" width="252" height="87" fill="#c09b7b"/><path d="m62 89 138-63 138 63" fill="#ab8668"/><rect x="91" y="69" width="28" height="103" fill="#ddbf99"/><rect x="281" y="69" width="28" height="103" fill="#ddbf99"/><path d="M161 173v-48a39 39 0 0 1 78 0v48" fill="#8c7962"/><path d="M131 103h10m-10 21h10m-10 21h10m117-42h10m-10 21h10m-10 21h10" stroke="#f3dfbf" stroke-width="7"/><path d="M186 39q14-25 28 0v10h-28z" fill="#d6b58e"/>`,
+            Outdoors: `${sky}<path d="m0 148 105-88 94 81 89-96 112 103v42H0" fill="#9aab8c"/><path d="m0 158 94-45 129 52 110-46 67 29v42H0" fill="#768c70"/><path d="M208 144q-49 24 13 46" stroke="#e1d3b5" stroke-width="19" fill="none"/><path d="m61 160 3-56m-21 27 21-27 22 27m-37 15 15-21 18 21" stroke="#4f705e" stroke-width="6" fill="none"/>`,
+            Event: `<rect width="400" height="190" fill="#cbb59b"/><rect x="55" y="38" width="285" height="133" rx="8" fill="#ead6b8"/><path d="M55 70h285" stroke="#ae856b" stroke-width="25"/><path d="M98 24v36m197-36v36" stroke="#816950" stroke-width="8" stroke-linecap="round"/><path d="m124 111 20 20 44-37" stroke="#8b9a72" stroke-width="8" fill="none"/><path d="M226 104h72m-72 26h52m-52 22h65" stroke="#c4aa89" stroke-width="6"/>`,
+        };
+        return `<svg class="scene-svg" viewBox="0 0 400 190" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${art[type] || art.Sights}</svg>`;
+    }
+
+    window.PlanmateArtwork = { scene };
+})();

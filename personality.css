@@ -1,0 +1,637 @@
+/* Planmate's paper-and-marker layer. The original palette and type stay central. */
+:root {
+    --marker-font: "Permanent Marker", "Patrick Hand", "Segoe Print", cursive;
+    --ink-terracotta: #a86f54;
+    --ink-sage: #6f8060;
+    --motion-ease: cubic-bezier(0.2, 0.75, 0.3, 1);
+}
+body {
+    background-image: url("assets/paper-grain.svg");
+}
+.main-shell,
+.profile-page {
+    background-image: url("assets/travel-background.svg"), url("assets/paper-grain.svg");
+    background-size:
+        100% auto,
+        120px 120px;
+    background-position:
+        center top,
+        left top;
+    background-repeat: repeat-y, repeat;
+}
+.welcome-panel::before {
+    inset: 0;
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: url("assets/travel-background.svg") center top / 100% auto repeat-y;
+    opacity: 0.85;
+    pointer-events: none;
+}
+.form-section {
+    background-image: url("assets/travel-background.svg"), url("assets/paper-grain.svg");
+    background-size:
+        100% auto,
+        120px 120px;
+    background-position:
+        center top,
+        left top;
+    background-repeat: repeat-y, repeat;
+}
+.brand-star {
+    display: inline-block;
+    transition: transform 0.35s var(--motion-ease);
+}
+.brand:hover .brand-star {
+    transform: rotate(45deg);
+}
+.marker-line {
+    position: relative;
+    isolation: isolate;
+}
+.marker-line::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    height: 8px;
+    left: -2px;
+    right: -2px;
+    bottom: 2px;
+    background: #d7b18a5c;
+    border-radius: 50% 30% 45% 20%;
+    transform: rotate(-1.5deg);
+}
+.graffiti-tag {
+    font-family: var(--marker-font);
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 1.12;
+    color: var(--brown-dark);
+    letter-spacing: -0.6px;
+    transform: rotate(-7deg);
+    text-shadow: 2px 2px 0 #fffdf9;
+}
+.graffiti-tag em {
+    color: var(--ink-terracotta);
+    font-style: normal;
+}
+.paper-sticker {
+    display: inline-block;
+    padding: 7px 13px;
+    border: 2px solid #fffdf9;
+    border-radius: 5px;
+    background: #e8d8bd;
+    color: #71563e;
+    font-family: var(--font-hand);
+    font-size: 16px;
+    line-height: 1.15;
+    box-shadow:
+        0 2px 0 #b89d7f35,
+        0 3px 10px #4e3b2c0a;
+    transform: rotate(5deg);
+}
+.paper-sticker.sage {
+    background: #dce3ce;
+    color: #586a45;
+}
+.ink-stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1.5px dashed #9c7e5e;
+    border-radius: 5px;
+    color: #816342;
+    padding: 4px 9px;
+    font: 500 10px var(--font-body);
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    transform: rotate(-4deg);
+}
+
+/* Keep the headline and all trip controls clear of the decorative margin. */
+.hero {
+    min-height: 248px;
+    box-shadow: inset 0 0 0 5px #fffdf933;
+}
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: url("assets/paper-grain.svg");
+}
+.hero-artwork {
+    position: relative;
+    width: 310px;
+    height: 205px;
+    flex-shrink: 0;
+    margin-left: 18px;
+}
+.hero-artwork .hero-art {
+    width: 285px;
+    height: 184px;
+    position: absolute;
+    bottom: -4px;
+    right: -5px;
+    margin: 0;
+}
+.hero-tag {
+    position: absolute;
+    top: 0;
+    left: 13px;
+    z-index: 1;
+    font-size: 28px;
+}
+.hero-sticker {
+    position: absolute;
+    right: -3px;
+    top: 29px;
+    z-index: 2;
+    font-size: 14px;
+}
+.hero-scribble {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    font-family: var(--font-hand);
+    font-size: 17px;
+    color: #806347;
+    transform: rotate(-5deg);
+}
+.hero-copy .eyebrow {
+    display: inline-block;
+    border-bottom: 1px dashed #b79a75;
+    padding-bottom: 6px;
+}
+.hero h1 {
+    max-width: 650px;
+}
+.sidebar-note p {
+    color: #856748;
+}
+.sidebar-note::after {
+    content: "";
+    position: absolute;
+    right: 8px;
+    bottom: 13px;
+    width: 50px;
+    height: 40px;
+    background: url("assets/travel-doodles.svg") 82% 4% / 230px auto;
+    opacity: 0.6;
+    pointer-events: none;
+}
+.section-heading h2 {
+    position: relative;
+    isolation: isolate;
+}
+.section-heading h2::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    bottom: 1px;
+    width: min(175px, 78%);
+    height: 7px;
+    border-radius: 40% 20% 50% 25%;
+    background: #e1c4a15c;
+    transform: rotate(-1.2deg);
+}
+.hand-note {
+    transform: rotate(-3deg);
+}
+.view-tabs button[aria-selected="true"]::after {
+    height: 4px;
+    border-radius: 45% 25% 30% 50%;
+    transform: rotate(-1deg);
+}
+.place-card {
+    box-shadow:
+        0 4px 0 #eadfce5c,
+        0 7px 19px #4e3b2c06;
+}
+.place-category {
+    border: 2px solid #fffdf9;
+    transform: rotate(-3deg);
+    box-shadow: 0 2px 5px #4e3b2c0a;
+}
+.custom-callout {
+    position: relative;
+    border-style: dashed;
+    background-image: url("assets/paper-grain.svg");
+}
+.custom-callout strong {
+    display: inline-block;
+    transform: rotate(-1deg);
+}
+.itinerary-aside {
+    border-top: 3px solid #c5ad8b;
+}
+.aside-header h2 {
+    transform: rotate(-1deg);
+}
+.planning-badge {
+    border-style: dashed;
+}
+
+/* The same little sticker vocabulary carries through login and profile. */
+.welcome-content {
+    position: relative;
+    z-index: 1;
+}
+.welcome-art {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 27px 0 23px;
+    min-height: 62px;
+}
+.welcome-art .graffiti-tag {
+    font-size: 29px;
+}
+.welcome-doodles {
+    width: 125px;
+    height: 80px;
+    object-fit: contain;
+    opacity: 0.85;
+}
+.welcome-art .paper-sticker {
+    font-size: 14px;
+    align-self: flex-end;
+    margin-bottom: 5px;
+}
+.plan-preview {
+    position: relative;
+    transform: rotate(-1.5deg);
+    border: 1px solid #d8c6ae;
+    box-shadow:
+        4px 5px 0 #d1bfa045,
+        0 12px 32px #4e3b2c08;
+}
+.plan-preview::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 78px;
+    left: 43%;
+    top: -10px;
+    background: #e7d9bcbd;
+    border: 1px solid #dccbac88;
+    transform: rotate(-5deg);
+}
+.form-heading h2 {
+    font-family: var(--font-hand);
+}
+.login-card {
+    position: relative;
+}
+.login-stamp {
+    position: absolute;
+    right: 0;
+    top: -23px;
+}
+.mobile-logo {
+    font-family: var(--font-hand);
+}
+.profile-intro {
+    position: relative;
+}
+.profile-artwork {
+    position: relative;
+    width: 220px;
+    height: 155px;
+    flex-shrink: 0;
+}
+.profile-artwork .profile-doodle {
+    position: absolute;
+    right: 8px;
+    bottom: 0;
+    opacity: 0.85;
+}
+.profile-artwork .graffiti-tag {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 25px;
+    z-index: 1;
+}
+.profile-intro h1 {
+    position: relative;
+    display: block;
+    width: fit-content;
+    isolation: isolate;
+}
+.profile-intro h1::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    height: 10px;
+    left: 3px;
+    right: 18px;
+    bottom: 4px;
+    background: #dcc6a26b;
+    border-radius: 45% 20% 50% 15%;
+    transform: rotate(-2deg);
+}
+.identity-card {
+    background-image:
+        url("assets/paper-grain.svg"), radial-gradient(circle at 50% 0, #fffaf0, transparent 62%);
+}
+.profile-panel {
+    box-shadow: 0 4px 0 #eadfce4a;
+}
+.section-number {
+    transform: rotate(-5deg);
+    border-style: dashed;
+}
+
+/* Entrances run once. Scroll never hides content or blocks a control. */
+@media (prefers-reduced-motion: no-preference) {
+    .motion-enter {
+        animation: paper-arrive 0.5s var(--motion-ease) both;
+        animation-delay: var(--motion-delay, 0ms);
+    }
+    .hero-artwork,
+    .profile-artwork,
+    .welcome-art {
+        animation: sketch-arrive 0.75s var(--motion-ease) both;
+    }
+    .hero-tag,
+    .profile-artwork .graffiti-tag {
+        animation: ink-arrive 0.6s 0.12s var(--motion-ease) backwards;
+    }
+    .hero-sticker {
+        animation: sticker-arrive 0.6s 0.3s var(--motion-ease) backwards;
+    }
+    .marker-line::after {
+        transform-origin: left;
+        animation: marker-sweep 0.6s 0.3s var(--motion-ease) backwards;
+    }
+    .save-place.saved svg,
+    .vote-button.voted svg {
+        animation: heart-stamp 0.38s var(--motion-ease);
+    }
+    dialog[open] .dialog-inner {
+        animation: paper-arrive 0.22s var(--motion-ease);
+    }
+    .progress {
+        transform-origin: left;
+        animation: marker-sweep 0.85s 0.2s var(--motion-ease) backwards;
+    }
+    .button,
+    .nav-item,
+    .filter-chip,
+    .save-place,
+    .vote-button,
+    .hobby-chip span,
+    .place-option > span {
+        transition:
+            transform 0.2s var(--motion-ease),
+            background 0.2s,
+            border-color 0.2s,
+            box-shadow 0.2s;
+    }
+    .button:active,
+    .filter-chip:active,
+    .save-place:active,
+    .vote-button:active {
+        transform: translateY(1px) scale(0.97);
+    }
+    .button svg {
+        transition: transform 0.2s var(--motion-ease);
+    }
+    .button:hover svg {
+        transform: translateY(-1px) rotate(-6deg);
+    }
+    .place-card .venue-photo {
+        transition: transform 0.45s var(--motion-ease);
+    }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .place-card:hover {
+        transform: translateY(-4px);
+        box-shadow:
+            0 6px 0 #eadfce5c,
+            0 12px 26px #4e3b2c0d;
+    }
+    .place-card:hover .venue-photo {
+        transform: scale(1.035);
+    }
+    .nav-item:hover > svg {
+        transform: rotate(-8deg);
+    }
+    .hero:hover .hero-sticker {
+        transform: rotate(1deg) translateY(-2px);
+    }
+    .hero-sticker {
+        transition: transform 0.3s var(--motion-ease);
+    }
+}
+@keyframes paper-arrive {
+    from {
+        opacity: 0;
+        translate: 0 10px;
+    }
+    to {
+        opacity: 1;
+        translate: 0 0;
+    }
+}
+@keyframes sketch-arrive {
+    from {
+        opacity: 0;
+        translate: 0 8px;
+    }
+    to {
+        opacity: 1;
+        translate: 0 0;
+    }
+}
+@keyframes ink-arrive {
+    from {
+        opacity: 0;
+        scale: 0.94;
+    }
+    to {
+        opacity: 1;
+        scale: 1;
+    }
+}
+@keyframes sticker-arrive {
+    from {
+        opacity: 0;
+        transform: rotate(10deg) translateY(-7px);
+    }
+    to {
+        opacity: 1;
+        transform: rotate(5deg) translateY(0);
+    }
+}
+@keyframes marker-sweep {
+    from {
+        scale: 0 1;
+    }
+    to {
+        scale: 1 1;
+    }
+}
+@keyframes heart-stamp {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    45% {
+        transform: scale(1.22) rotate(-8deg);
+    }
+}
+
+@media (max-width: 1200px) {
+    .hero-artwork {
+        width: 245px;
+        margin-left: 10px;
+    }
+    .hero-artwork .hero-art {
+        width: 250px;
+    }
+    .hero-tag {
+        font-size: 25px;
+        left: 4px;
+    }
+    .hero-sticker {
+        right: -5px;
+        font-size: 12px;
+    }
+}
+@media (max-width: 950px) {
+    .welcome-art {
+        margin: 23px 0;
+    }
+    .welcome-doodles {
+        width: 105px;
+    }
+    .welcome-art .graffiti-tag {
+        font-size: 26px;
+    }
+}
+@media (max-width: 680px) {
+    .hero {
+        min-height: 245px;
+        padding: 24px 20px 82px;
+    }
+    .hero-copy {
+        padding: 0;
+    }
+    .hero-artwork {
+        position: absolute;
+        width: 135px;
+        height: 73px;
+        bottom: 6px;
+        right: 17px;
+        margin: 0;
+        opacity: 1;
+    }
+    .hero-artwork .hero-art {
+        width: 110px;
+        height: 75px;
+        right: -8px;
+        bottom: -2px;
+        opacity: 0.5;
+    }
+    .hero-tag {
+        left: -3px;
+        top: 17px;
+        font-size: 18px;
+    }
+    .hero-sticker {
+        top: 3px;
+        right: 4px;
+        font-size: 10px;
+        padding: 4px 7px;
+    }
+    .hero-scribble {
+        display: none;
+    }
+    .hero-copy .eyebrow {
+        font-size: 8px;
+        letter-spacing: 1px;
+    }
+    .hero-bottom {
+        margin-top: 19px;
+    }
+    .hero h1 {
+        font-size: 35px;
+    }
+    .hero::after {
+        opacity: 0.7;
+    }
+    .hero .hero-copy {
+        z-index: 2;
+    }
+    .hero-artwork {
+        pointer-events: none;
+    }
+    .place-category {
+        font-size: 9px;
+    }
+    .welcome-art {
+        margin: 20px 0;
+        gap: 14px;
+    }
+    .welcome-art .graffiti-tag {
+        font-size: 23px;
+    }
+    .welcome-doodles {
+        width: 85px;
+        height: 65px;
+    }
+    .welcome-art .paper-sticker {
+        font-size: 12px;
+    }
+    .login-stamp {
+        top: -16px;
+        right: 3px;
+        font-size: 9px;
+    }
+    .profile-artwork {
+        width: 92px;
+        height: 90px;
+        position: absolute;
+        right: 0;
+        bottom: -5px;
+        opacity: 0.6;
+        pointer-events: none;
+    }
+    .profile-artwork .profile-doodle {
+        width: 80px;
+        height: 65px;
+        top: auto;
+        bottom: 0;
+        right: 0;
+        z-index: 0;
+    }
+    .profile-artwork .graffiti-tag {
+        display: none;
+    }
+    .profile-intro > div:first-child {
+        position: relative;
+        z-index: 1;
+    }
+    .profile-intro h1 {
+        font-size: 42px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+    .motion-enter {
+        opacity: 1;
+    }
+    .place-card:hover {
+        transform: none;
+    }
+}
