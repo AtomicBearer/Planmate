@@ -1,7 +1,7 @@
 "use strict";
 const { test } = require("node:test"),
     assert = require("node:assert/strict"),
-    D = require("../form-drafts");
+    D = require("../public/js/form-drafts.js");
 const context = { owner: "guest:browser", space: "trip-a", member: "a" };
 function memory() {
     const data = new Map();

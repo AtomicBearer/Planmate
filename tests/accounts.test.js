@@ -2,13 +2,13 @@
 const { test } = require("node:test"),
     assert = require("node:assert/strict"),
     { createPlannerServer } = require("./server-fixture"),
-    Core = require("../planner-core"),
-    { createPlanStore } = require("../plan-store"),
+    Core = require("../shared/planner-core.js"),
+    { createPlanStore } = require("../server/storage/plan-store.js"),
     fs = require("node:fs"),
     path = require("node:path"),
     os = require("node:os"),
     sharp = require("sharp"),
-    { processImage } = require("../media-store");
+    { processImage } = require("../server/services/media-store.js");
 const trip = {
     title: "Account fixture",
     city: "Goa",

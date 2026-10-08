@@ -1,8 +1,8 @@
 "use strict";
 const { test } = require("node:test"),
     assert = require("node:assert/strict"),
-    C = require("../planner-core"),
-    { validateImage } = require("../media-store");
+    C = require("../shared/planner-core.js"),
+    { validateImage } = require("../server/services/media-store.js");
 const act = (s, type, payload = {}, id = "a") => C.apply(s, { type, payload }, id);
 function fresh() {
     const s = C.createState(

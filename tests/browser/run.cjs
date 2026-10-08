@@ -10,9 +10,10 @@ const cases = [
     "account",
     "discovery-ui",
     "night-fit",
+    "demo",
 ];
 (async () => {
-    const selected = process.argv.slice(2);
+    const selected = process.argv.slice(2).filter((argument) => argument !== "--");
     for (const name of selected.length ? selected : cases) {
         if (!cases.includes(name)) throw new Error("Unknown browser case: " + name);
         await new Promise((resolve, reject) => {

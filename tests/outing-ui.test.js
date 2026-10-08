@@ -4,8 +4,8 @@ const { test } = require("node:test"),
     fs = require("node:fs"),
     path = require("node:path"),
     vm = require("node:vm"),
-    C = require("../planner-core"),
-    Utils = require("../browser-utils");
+    C = require("../shared/planner-core.js"),
+    Utils = require("../public/js/browser-utils.js");
 
 function deferred() {
     let resolve;
@@ -116,7 +116,7 @@ function page(module, options = {}) {
         blobRequest: async () => ({}),
     };
     const window = { PlannerCore: C, PlanmateUtils: Utils };
-    vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../" + module), "utf8"), {
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../public/js/" + module), "utf8"), {
         window,
         document,
         Date,

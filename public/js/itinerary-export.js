@@ -2,7 +2,7 @@
 (function (root, factory) {
     "use strict";
     if (typeof module === "object" && module.exports)
-        module.exports = factory(require("./planner-core"), root);
+        module.exports = factory(require("../../shared/planner-core.js"), root);
     else root.PlanmateExport = factory(root.PlannerCore, root);
 })(typeof window === "object" ? window : globalThis, function (Core, root) {
     "use strict";

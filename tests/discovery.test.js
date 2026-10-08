@@ -1,9 +1,9 @@
 "use strict";
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { createDiscovery } = require("../discovery");
+const { createDiscovery } = require("../server/services/discovery.js");
 const { createPlannerServer } = require("./server-fixture");
-const Core = require("../planner-core");
+const Core = require("../shared/planner-core.js");
 const time = Date.parse("2026-10-08T10:00:00Z");
 const params = (values) => new URLSearchParams(values);
 const ok = (value) => ({ ok: true, json: async () => value });

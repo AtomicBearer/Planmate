@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { launchBrowser } = require("./helpers.cjs");
 const { createPlannerServer } = require("../server-fixture");
-const catalogue = require("../../catalogue");
+const catalogue = require("../../shared/catalogue.js");
 (async () => {
     const server = createPlannerServer({ dataFile: null });
     await new Promise((r) => server.listen(0, "127.0.0.1", r));

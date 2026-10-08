@@ -3,19 +3,11 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-const publicFiles = require("../public-files");
+const publicFiles = require("../server/public-files.js");
+const { resolvePublicFile } = require("../server/static-files.js");
 
 const root = path.resolve(__dirname, "..");
 const publicSet = new Set(publicFiles);
-const serverFiles = new Set([
-    "server.js",
-    "plan-store.js",
-    "account-service.js",
-    "discovery.js",
-    "public-files.js",
-    "map-service.js",
-    "media-store.js",
-]);
 const references = new Set();
 const problems = [];
 const dependencies = {
@@ -72,13 +64,17 @@ function attributes(tag) {
     );
 }
 
+function publicUrl(from, value) {
+    return new URL(value, `https://planmate.invalid/${from}`).pathname.slice(1);
+}
 function reference(from, value) {
     if (!value || /^(?:[a-z][\w+.-]*:|\/\/|#)/i.test(value)) return;
     const pathname = value.split(/[?#]/)[0];
     if (!pathname) return;
-    const file = path.posix.normalize(path.posix.join(path.posix.dirname(from), pathname));
+    const file = publicUrl(from, pathname);
     if (!publicSet.has(file)) report(from, `${value} is not in public-files.js`);
-    if (!fs.existsSync(path.join(root, file))) report(from, `${value} is missing`);
+    const resource = resolvePublicFile(file);
+    if (!resource || !fs.existsSync(resource.absolute)) report(from, `${value} is missing`);
     references.add(file);
 }
 
@@ -103,8 +99,9 @@ function checkHtml(file, source) {
             reference(file, value);
         }
         if (name.toLowerCase() === "script" && attrs.src && !/^https?:/.test(attrs.src)) {
-            scripts.push(attrs.src);
-            for (const dependency of dependencies[attrs.src] || []) {
+            const name = path.posix.basename(publicUrl(file, attrs.src));
+            scripts.push(name);
+            for (const dependency of dependencies[name] || []) {
                 if (!scripts.includes(dependency)) {
                     report(file, `${dependency} must load before ${attrs.src}`);
                 }
@@ -114,23 +111,18 @@ function checkHtml(file, source) {
 }
 
 if (publicSet.size !== publicFiles.length) report("public-files.js", "duplicate public files");
-for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
-    if (!entry.isFile() || serverFiles.has(entry.name)) continue;
-    if (/\.(html|css|js)$/.test(entry.name) && !publicSet.has(entry.name)) {
-        report(entry.name, "browser file is missing from public-files.js");
-    }
-}
-function checkAssets(directory, prefix = "assets") {
+function checkAssets(directory, prefix = "") {
     for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-        const file = `${prefix}/${entry.name}`;
+        const file = prefix ? `${prefix}/${entry.name}` : entry.name;
         if (entry.isDirectory()) checkAssets(path.join(directory, entry.name), file);
         else if (!publicSet.has(file)) report(file, "asset is missing from public-files.js");
     }
 }
-checkAssets(path.join(root, "assets"));
+checkAssets(path.join(root, "public"));
+checkAssets(path.join(root, "shared"), "shared");
 for (const file of publicFiles) {
-    const absolute = path.join(root, file);
-    if (!fs.existsSync(absolute)) {
+    const absolute = resolvePublicFile(file)?.absolute;
+    if (!absolute || !fs.existsSync(absolute)) {
         report("public-files.js", `${file} is missing`);
         continue;
     }
@@ -146,7 +138,7 @@ for (const file of publicFiles) {
     }
     if (file.endsWith(".js") && !file.startsWith("assets/")) {
         for (const match of source.matchAll(/loadScript\(["']([^"']+)["']\)/g))
-            reference(file, match[1]);
+            reference("dashboard.html", match[1]);
     }
 }
 for (const file of publicFiles) {
@@ -155,7 +147,11 @@ for (const file of publicFiles) {
 
 function checkJavaScript(directory) {
     for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-        if (entry.name.startsWith(".") || ["node_modules", "data"].includes(entry.name)) continue;
+        if (
+            entry.name.startsWith(".") ||
+            ["node_modules", "data", "output", "tmp", "test-results"].includes(entry.name)
+        )
+            continue;
         const absolute = path.join(directory, entry.name);
         if (entry.isDirectory()) {
             checkJavaScript(absolute);

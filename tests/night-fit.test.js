@@ -1,9 +1,9 @@
 "use strict";
 const { test } = require("node:test"),
     assert = require("node:assert/strict"),
-    C = require("../planner-core"),
-    catalogue = require("../catalogue"),
-    exporter = require("../itinerary-export");
+    C = require("../shared/planner-core.js"),
+    catalogue = require("../shared/catalogue.js"),
+    exporter = require("../public/js/itinerary-export.js");
 const act = (s, type, payload = {}, member = "a") => C.apply(s, { type, payload }, member);
 const Fit = C.agreement.fit,
     Time = C.agreement.time;

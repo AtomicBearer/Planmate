@@ -156,6 +156,7 @@
     }
     .topbar {
         height: auto;
+        flex-wrap: wrap;
         padding: 0 20px 15px;
         border: 0;
         gap: 8px;
@@ -165,7 +166,9 @@
         gap: 9px;
     }
     .top-actions {
-        gap: 0;
+        gap: 8px;
+        flex-wrap: wrap;
+        max-width: 100%;
     }
     .main-content {
         padding: 0 16px 20px;
@@ -200,9 +203,16 @@
     }
     .trip-strip {
         padding: 20px 0;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .trip-detail {
         gap: 8px;
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+    .trip-detail > span {
+        min-width: 0;
+        overflow-wrap: anywhere;
     }
     .trip-detail strong {
         font-size: 10px;

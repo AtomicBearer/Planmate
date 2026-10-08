@@ -5,8 +5,8 @@ data/
 .qa/
 .env*
 pnpm-lock.yaml
-assets/vendor/
-assets/pdf-fonts.js
+public/assets/vendor/
+public/assets/pdf-fonts.js
 tmp/
 output/
 licenses/pdf-export/

@@ -11,34 +11,34 @@
             href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Patrick+Hand&family=Permanent+Marker&display=swap"
             rel="stylesheet"
         />
-        <link rel="stylesheet" href="shared.css" />
-        <link rel="stylesheet" href="dashboard.css" />
-        <link rel="stylesheet" href="dashboard-responsive.css" />
-        <link rel="stylesheet" href="group-planning.css" />
-        <link rel="stylesheet" href="personality.css" />
-        <script src="browser-utils.js" defer></script>
-        <script src="account-client.js" defer></script>
-        <script src="dashboard-navigation.js" defer></script>
-        <script src="shared-sync.js" defer></script>
-        <script src="planner-ui.js" defer></script>
-        <script src="dashboard-renderers.js" defer></script>
-        <script src="place-illustrations.js" defer></script>
-        <script src="form-drafts.js" defer></script>
-        <script src="planning-time.js" defer></script>
-        <script src="group-fit.js" defer></script>
-        <script src="outing-rules.js" defer></script>
-        <script src="expense-rules.js" defer></script>
-        <script src="planning-rules.js" defer></script>
-        <script src="planner-core.js" defer></script>
-        <script src="catalogue.js" defer></script>
-        <script src="profile-rules.js" defer></script>
-        <script src="profile-store.js" defer></script>
-        <script src="itinerary-export.js" defer></script>
-        <script src="outing-ui.js" defer></script>
-        <script src="memories-ui.js" defer></script>
-        <script src="group-planning.js" defer></script>
-        <script src="dashboard.js" defer></script>
-        <script src="motion.js" defer></script>
+        <link rel="stylesheet" href="css/shared.css" />
+        <link rel="stylesheet" href="css/dashboard.css" />
+        <link rel="stylesheet" href="css/dashboard-responsive.css" />
+        <link rel="stylesheet" href="css/group-planning.css" />
+        <link rel="stylesheet" href="css/personality.css" />
+        <script src="js/browser-utils.js" defer></script>
+        <script src="js/account-client.js" defer></script>
+        <script src="js/dashboard-navigation.js" defer></script>
+        <script src="js/shared-sync.js" defer></script>
+        <script src="js/planner-ui.js" defer></script>
+        <script src="js/dashboard-renderers.js" defer></script>
+        <script src="js/place-illustrations.js" defer></script>
+        <script src="js/form-drafts.js" defer></script>
+        <script src="../shared/planning-time.js" defer></script>
+        <script src="../shared/group-fit.js" defer></script>
+        <script src="../shared/outing-rules.js" defer></script>
+        <script src="../shared/expense-rules.js" defer></script>
+        <script src="../shared/planning-rules.js" defer></script>
+        <script src="../shared/planner-core.js" defer></script>
+        <script src="../shared/catalogue.js" defer></script>
+        <script src="../shared/profile-rules.js" defer></script>
+        <script src="js/profile-store.js" defer></script>
+        <script src="js/itinerary-export.js" defer></script>
+        <script src="js/outing-ui.js" defer></script>
+        <script src="js/memories-ui.js" defer></script>
+        <script src="js/group-planning.js" defer></script>
+        <script src="js/dashboard.js" defer></script>
+        <script src="js/motion.js" defer></script>
     </head>
     <body>
         <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -190,6 +190,13 @@
                     ><div class="breadcrumb"
                         ><span>Your space</span><span>/</span><strong>Trip planner</strong></div
                     ><div class="top-actions"
+                        ><a
+                            class="button secondary small"
+                            href="demo.html"
+                            target="_blank"
+                            rel="noopener"
+                            aria-label="Demo guide (opens in a new tab)"
+                            >Demo guide ↗</a
                         ><span class="save-status" id="saveStatus"
                             ><span></span>Saved on this browser</span
                         ><button class="button secondary small" data-action="invite"

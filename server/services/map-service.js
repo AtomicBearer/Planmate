@@ -1,6 +1,6 @@
 "use strict";
 const crypto = require("node:crypto"),
-    C = require("./planner-core");
+    C = require("../../shared/planner-core.js");
 const https = (v) => {
     try {
         const u = new URL(v);
@@ -15,9 +15,14 @@ function createMapService({
     now = Date.now,
 } = {}) {
     const key = env.GOOGLE_STATIC_MAPS_API_KEY,
+        routeKey = env.GOOGLE_ROUTES_API_KEY,
         routeFeed = https(env.ROUTES_FEED_URL),
         images = new Map();
-    const config = () => ({ googleMap: Boolean(key), routes: Boolean(routeFeed) });
+    const config = () => ({
+        googleMap: Boolean(key),
+        routes: Boolean(routeFeed || routeKey),
+        routeProvider: routeFeed ? "Connected route feed" : routeKey ? "Google Routes" : "",
+    });
     async function coords(p, discovery, allowGoogle) {
         if (p.provider !== "google") return p.coordinates || null;
         if (!allowGoogle) return null;
@@ -152,7 +157,7 @@ function createMapService({
         return { bytes, type: response.headers.get("content-type") };
     }
     async function route(s, v, discovery) {
-        if (!routeFeed)
+        if (!routeFeed && !routeKey)
             throw Object.assign(
                 new Error(
                     "Route provider not connected. Keep your clearly labelled manual travel buffers.",
@@ -165,6 +170,84 @@ function createMapService({
         const a = await coords(from.place, discovery, true),
             b = await coords(to.place, discovery, true);
         C.check(a && b, "Coordinates are missing for one of these stops. Use a manual estimate.");
+        if (!routeFeed) {
+            let response;
+            try {
+                response = await fetchImpl(
+                    "https://routes.googleapis.com/directions/v2:computeRoutes",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-Goog-Api-Key": routeKey,
+                            "X-Goog-FieldMask": "routes.duration,routes.distanceMeters",
+                        },
+                        body: JSON.stringify({
+                            origin: {
+                                location: {
+                                    latLng: { latitude: a.latitude, longitude: a.longitude },
+                                },
+                            },
+                            destination: {
+                                location: {
+                                    latLng: { latitude: b.latitude, longitude: b.longitude },
+                                },
+                            },
+                            travelMode: "DRIVE",
+                            routingPreference: "TRAFFIC_UNAWARE",
+                            computeAlternativeRoutes: false,
+                            units: "METRIC",
+                        }),
+                        redirect: "error",
+                        signal: AbortSignal.timeout(8000),
+                    },
+                );
+            } catch {
+                throw new Error(
+                    "Google Routes is unreachable. Retain your manual estimate and try again.",
+                );
+            }
+            C.check(
+                response.ok,
+                "Google Routes rejected the request. Check the API key, enabled Routes API, billing and quota; retain your manual estimate.",
+            );
+            let data;
+            try {
+                data = await response.json();
+            } catch {
+                throw new Error(
+                    "Google Routes returned an unreadable response. Retain your manual estimate.",
+                );
+            }
+            const route = data.routes?.[0];
+            C.check(
+                route,
+                "Google Routes found no driving route for these locations. Retain your manual estimate.",
+            );
+            C.check(
+                typeof route.duration === "string" && /^\d+(?:\.\d+)?s$/.test(route.duration),
+                "Google Routes did not supply a valid duration.",
+            );
+            const source = new URL("https://www.google.com/maps/dir/");
+            source.search = new URLSearchParams({
+                api: "1",
+                origin: `${a.latitude},${a.longitude}`,
+                destination: `${b.latitude},${b.longitude}`,
+                travelmode: "driving",
+            }).toString();
+            return {
+                durationSeconds: C.number(
+                    Number(route.duration.slice(0, -1)),
+                    "Route duration",
+                    0,
+                    86400,
+                ),
+                distanceMeters: C.number(route.distanceMeters, "Route distance", 0, 2000000),
+                provider: "Google Routes · driving without traffic",
+                sourceUrl: source.href,
+                checkedAt: new Date(now()).toISOString(),
+            };
+        }
         const response = await fetchImpl(routeFeed, {
             method: "POST",
             headers: {

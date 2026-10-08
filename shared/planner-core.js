@@ -1,7 +1,7 @@
 /* Shared planning rules, used by both the browser and the local server. */
 (function (root, factory) {
     if (typeof module === "object" && module.exports)
-        module.exports = factory(require("./planning-rules"));
+        module.exports = factory(require("./planning-rules.js"));
     else root.PlannerCore = factory(root.PlanningRules);
 })(typeof globalThis !== "undefined" ? globalThis : this, function (Rules) {
     "use strict";

@@ -2,10 +2,10 @@
 (function (root, factory) {
     if (typeof module === "object" && module.exports)
         module.exports = factory(
-            require("./group-fit"),
-            require("./outing-rules"),
-            require("./expense-rules"),
-            require("./planning-time"),
+            require("./group-fit.js"),
+            require("./outing-rules.js"),
+            require("./expense-rules.js"),
+            require("./planning-time.js"),
         );
     else
         root.PlanningRules = factory(

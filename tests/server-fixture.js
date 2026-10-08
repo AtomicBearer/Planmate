@@ -1,5 +1,5 @@
 "use strict";
-const { createPlannerServer: createServer } = require("../server");
+const { createPlannerServer: createServer } = require("../server/index.js");
 // Disposable stores and explicit provider environments keep tests independent of
 // real data and any credentials inherited from the developer's shell.
 function createPlannerServer(options = {}) {

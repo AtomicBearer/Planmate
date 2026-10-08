@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-const { escapeHtml, readJson } = require("../browser-utils");
+const { escapeHtml, readJson } = require("../public/js/browser-utils.js");
 
 test("shared HTML escaping keeps user names and attribute values as text", () => {
     assert.equal(
@@ -74,7 +74,10 @@ function loginPage(search = "", storageError = false) {
         atob: (value) => Buffer.from(value, "base64").toString("binary"),
         console: { error() {} },
     };
-    vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../login.js"), "utf8"), context);
+    vm.runInNewContext(
+        fs.readFileSync(path.join(__dirname, "../public/js/login.js"), "utf8"),
+        context,
+    );
     return { element, stored, timers, context };
 }
 

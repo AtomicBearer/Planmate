@@ -1,6 +1,6 @@
 "use strict";
 const crypto = require("node:crypto");
-const Core = require("./planner-core");
+const Core = require("../../shared/planner-core.js");
 
 // Multiple specific searches avoid the per-query result cap. Each click requests
 // at most three pages; a city can yield hundreds of unique provider IDs.

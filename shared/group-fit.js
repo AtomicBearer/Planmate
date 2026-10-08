@@ -1,7 +1,7 @@
 /* Transparent group-fit scoring and draft generation. All money here is estimates. */
 (function (root, factory) {
     if (typeof module === "object" && module.exports)
-        module.exports = factory(require("./planning-time"));
+        module.exports = factory(require("./planning-time.js"));
     else root.GroupFit = factory(root.PlanningTime);
 })(typeof globalThis !== "undefined" ? globalThis : this, function (Time) {
     "use strict";

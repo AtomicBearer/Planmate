@@ -1,9 +1,9 @@
 "use strict";
 const { test } = require("node:test"),
     assert = require("node:assert/strict"),
-    C = require("../planner-core"),
-    catalogue = require("../catalogue"),
-    { createMapService } = require("../map-service");
+    C = require("../shared/planner-core.js"),
+    catalogue = require("../shared/catalogue.js"),
+    { createMapService } = require("../server/services/map-service.js");
 const act = (s, type, payload = {}, id = "a") => C.apply(s, { type, payload }, id);
 function fresh() {
     let s = C.createState(

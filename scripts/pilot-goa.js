@@ -1,7 +1,7 @@
 /* Bounded, opt-in live pilot. No third-party place/photo data is written to disk. */
 "use strict";
 const fs = require("node:fs"),
-    { createDiscovery } = require("../discovery");
+    { createDiscovery } = require("../server/services/discovery.js");
 async function pilot({ live = false, discovery = createDiscovery() } = {}) {
     const config = discovery.config(),
         report = {

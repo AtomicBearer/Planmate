@@ -1,8 +1,8 @@
 "use strict";
 const { test } = require("node:test"),
     assert = require("node:assert/strict"),
-    Sync = require("../shared-sync"),
-    Nav = require("../dashboard-navigation");
+    Sync = require("../public/js/shared-sync.js"),
+    Nav = require("../public/js/dashboard-navigation.js");
 test("delayed shared refresh cannot roll back a newer local save or leak into another trip/member", async () => {
     let context = { code: "trip", member: "a" },
         revision = 5,

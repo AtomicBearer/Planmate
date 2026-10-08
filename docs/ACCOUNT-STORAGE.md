@@ -24,9 +24,9 @@ Legacy plans import without claiming identities. Sign in on the browser that sti
 
 ## Transactional migration
 
-On startup, `plan-store.js` creates `data/plans.sqlite` and applies schema version 1 in a transaction. If `data/plans.json` exists, the server preserves it unchanged, creates `plans.json.pre-sqlite.backup`, validates and imports trips once, and records the import in SQLite. Repeating startup does not overwrite newer trip edits or duplicate records. Invalid source data aborts the import rather than deleting it. Every changed trip revision is compared within `BEGIN IMMEDIATE` before committing. Profile revisions have their own atomic comparison.
+On startup, `server/storage/plan-store.js` creates `data/plans.sqlite` and applies schema version 1 in a transaction. If `data/plans.json` exists, the server preserves it unchanged, creates `plans.json.pre-sqlite.backup`, validates and imports trips once, and records the import in SQLite. Repeating startup does not overwrite newer trip edits or duplicate records. Invalid source data aborts the import rather than deleting it. Every changed trip revision is compared within `BEGIN IMMEDIATE` before committing. Profile revisions have their own atomic comparison.
 
-This release targets **one Node process on one host with persistent local disk**, using SQLite WAL and a busy timeout. It does not claim horizontally scaled deployment, distributed media storage or multi-instance quotas. Keep the data directory outside publicly served paths. `PLANMATE_DATA_DIR` can point to an absolute data directory; its default is `data/` beside the server.
+This release targets **one Node process on one host with persistent local disk**, using SQLite WAL and a busy timeout. It does not claim horizontally scaled deployment, distributed media storage or multi-instance quotas. Keep the data directory outside publicly served paths. `PLANMATE_DATA_DIR` can point to an absolute data directory; its default is `data/` in the project root.
 
 Planning record feature version 2 adds `endNextDay=false` to older poll options and `needs=[]` to older trip preferences through idempotent defaults. Existing votes, plans, comments, confirmation snapshots, money and media remain intact. Draft input fingerprints now include active membership and candidate metadata; regenerate older drafts before applying them.
 

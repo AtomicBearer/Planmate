@@ -5,7 +5,7 @@ const { test } = require("node:test"),
     os = require("node:os"),
     path = require("node:path"),
     { createPlannerServer } = require("./server-fixture"),
-    catalogue = require("../catalogue");
+    catalogue = require("../shared/catalogue.js");
 const trip = {
     title: "Shared feature check",
     city: "Goa",

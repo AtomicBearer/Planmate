@@ -3,7 +3,7 @@
 const fs = require("node:fs"),
     path = require("node:path"),
     { DatabaseSync } = require("node:sqlite"),
-    Core = require("./planner-core");
+    Core = require("../../shared/planner-core.js");
 function conflict() {
     const e = new Error("The plan changed. Refresh it before saving.");
     e.status = 409;

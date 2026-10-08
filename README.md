@@ -2,6 +2,10 @@
 
 Planmate turns a group's interests, availability and budgets into a plan everyone can review and explicitly agree to. It uses vanilla HTML/CSS/JavaScript and a Node server, preserving the cream, beige and brown scrapbook theme, sage/terracotta accents, handwritten headings, original travel artwork and reduced-motion support.
 
+For the presentation, open the [demo guide](http://localhost:3000/demo.html). See [hackathon and public-link deployment](docs/HACKATHON.md) and the [complete API connection map](docs/API-CONNECTIONS.md). `pnpm run check:launch` checks public configuration without printing credentials or making provider requests.
+
+Source files are grouped into `public/` (pages/styles/browser scripts/assets), `shared/` (shared rules/catalogue), `server/` (API/services/storage), `docs/`, `scripts/` and `tests/`. The root `server.js` preserves launch commands; page URLs, invitations and the private root `data/` location remain compatible. Do not deploy `public/` alone for shared planning.
+
 ## Run locally
 
 Use Node.js 24.13 or newer. The tested package manager and dependency versions are pinned in package.json and pnpm-lock.yaml.
@@ -13,9 +17,9 @@ pnpm install --frozen-lockfile
 pnpm start
 ```
 
-Open [Planmate](http://localhost:3000/login.html) or [the dashboard](http://localhost:3000/dashboard.html). By default the server listens on this computer only. `pnpm run start:lan` exposes the local demo on your network; use the computer's reachable address in invitations. Public account deployment needs HTTPS and persistent disk; see [account, storage and recovery instructions](ACCOUNT-STORAGE.md).
+Open [Planmate](http://localhost:3000/login.html) or [the dashboard](http://localhost:3000/dashboard.html). By default the server listens on this computer only. `pnpm run start:lan` exposes the local demo on your network; use the computer's reachable address in invitations. Public account deployment needs HTTPS and persistent disk; see [account, storage and recovery instructions](docs/ACCOUNT-STORAGE.md).
 
-Directly opening dashboard.html provides a browser-only preview with local plans, suggestions, scheduling, comments and expenses. Shared synchronization, account profiles and uploaded photos require the server. The sample Goa plan and sample friends are labelled demonstrations. Create a trip for an empty plan or open a friend's invitation from **Join with an invitation**.
+Directly opening public/dashboard.html provides a browser-only preview with local plans, suggestions, scheduling, comments and expenses. Shared synchronization, account profiles and uploaded photos require the server. The sample Goa plan and sample friends are labelled demonstrations. Create a trip for an empty plan or open a friend's invitation from **Join with an invitation**.
 
 ## Plan together
 
@@ -39,7 +43,7 @@ Drafts are scoped to the profile/account, trip and member, limited to 60 bounded
 
 Google sign-in is server-verified when a client ID is configured. Local demo names/emails are explicitly unverified. Account trips bind membership to the verified account, prevent duplicate memberships, support expiring/revocable invitations, organizer transfer and member removal. Historical attribution, expense balances and recorded versions survive departure. Private account profiles follow the account across devices and have independent stale-save protection. Legacy membership claims require verified sign-in, the original membership token, current revision and explicit consent; email matches never claim ownership.
 
-Shared plans now persist in **SQLite**, with transactional revision checks and versioned import from the preserved original JSON. This release targets one Node process on one host with persistent disk. Own JPEG/PNG photos are decoded/re-encoded by Sharp, stripped of camera metadata and quota-limited. Provider photos are separate and transient. [ACCOUNT-STORAGE.md](ACCOUNT-STORAGE.md) explains configuration, consent-based profile import, migrations, limits, backup, restore and rollback.
+Shared plans now persist in **SQLite**, with transactional revision checks and versioned import from the preserved original JSON. This release targets one Node process on one host with persistent disk. Own JPEG/PNG photos are decoded/re-encoded by Sharp, stripped of camera metadata and quota-limited. Provider photos are separate and transient. [ACCOUNT-STORAGE.md](docs/ACCOUNT-STORAGE.md) explains configuration, consent-based profile import, migrations, limits, backup, restore and rollback.
 
 ## Group needs and late nights
 
@@ -74,7 +78,7 @@ Current local verification found Places, events, maps, routes and Google sign-in
 
 4. Open `http://localhost:3000/dashboard.html`, select a city, then choose **Find more places**. Use **Load more results** to continue provider discovery and **Show more places** to display more of the already loaded cards. Type a specific place, neighbourhood or activity and press Enter to search it.
 
-The general city search covers beaches, cafés, restaurants, bakeries, seafood, clubs, bars, live music venues, attractions, museums, landmarks, markets, parks, waterfalls, trails and water sports. Each click requests at most three provider pages. Google's [Text Search documentation](https://developers.google.com/maps/documentation/places/web-service/text-search) currently describes up to 20 results per page and 60 per query, so the app combines specific searches rather than trying to request 200 from one query. Provider IDs remove duplicates across pages/topics. **150–200+ choices are possible when the provider has sufficient matching inventory; the count is not guaranteed for every city or category.** More topics can be added to `QUERIES` in `discovery.js`; the offline starter picks live in `catalogue.js`.
+The general city search covers beaches, cafés, restaurants, bakeries, seafood, clubs, bars, live music venues, attractions, museums, landmarks, markets, parks, waterfalls, trails and water sports. Each click requests at most three provider pages. Google's [Text Search documentation](https://developers.google.com/maps/documentation/places/web-service/text-search) currently describes up to 20 results per page and 60 per query, so the app combines specific searches rather than trying to request 200 from one query. Provider IDs remove duplicates across pages/topics. **150–200+ choices are possible when the provider has sufficient matching inventory; the count is not guaranteed for every city or category.** More topics can be added to `QUERIES` in `server/services/discovery.js`; the offline starter picks live in `shared/catalogue.js`.
 
 Real photos come from [Place Photos](https://developers.google.com/maps/documentation/places/web-service/place-photos), with author credits and source links. Photos load only as their cards become visible. When a provider supplies no photo, or an image fails, the category illustration remains. There are no random stock photos presented as venue photos. Searches and photos can incur provider charges; use Google Cloud quotas/budgets and check the [current billing documentation](https://developers.google.com/maps/billing-and-pricing/overview).
 
@@ -123,15 +127,15 @@ The city feed receives a server-side HTTPS GET with `city`, `q`, `from`, `to`, `
 
 `id`, `name`, `city`, `date` and an HTTPS `ticketUrl` are required. Other fields are optional. Dates/times are local IST; types are `Comedy`, `Music`, `Theatre`, `Sports`, `Festival`, `Workshop` and `Other`. For Goa's towns, the adapter should return `city: "Goa"` and put the town/venue in `venue`, so statewide searches work. `nextPage` is the next integer page, or `null` when exhausted. Cancelled/postponed listings, past date ranges, unrelated cities, duplicates and invalid records are excluded. Upcoming events and ongoing multi-day events are included when their date ranges overlap the search. The feed must supply event data and poster rights appropriate for display and selected-event storage.
 
-The server provides `/api/discovery/config`, `/places`, `/events`, `/details` and signed `/photo` links under `/api/discovery/`. Credentials stay on the server. Discovery has its own request allowance, and provider errors/partial results remain visible. Live routing, opening hours, booking and ticket availability are separate integrations.
+The server provides `/api/discovery/config`, `/places`, `/events`, `/details` and signed `/photo` links under `/api/discovery/`. Credentials stay on the server. Discovery has its own request allowance, and provider errors/partial results remain visible. The itinerary supports direct Google Routes with `GOOGLE_ROUTES_API_KEY` or an authorized route feed; durations are clearly labelled and do not replace manual buffers automatically. See [the API guide](docs/API-CONNECTIONS.md). Verified-account-required mode restricts connected discovery to signed-in accounts. Opening hours, booking and ticket availability need their own sources.
 
 ## Modules and dependency order
 
-Browser files are linked from their pages and the explicit public allowlist. Credentials, databases, media directories and server modules are never served as static files. Shared business rules are usable in browser and server. See [MODULES.md](MODULES.md) for the current ownership map.
+Browser files are linked from their pages and the explicit public allowlist. Credentials, databases, media directories and server modules are never served as static files. Shared business rules are usable in browser and server. See [MODULES.md](docs/MODULES.md) for the current ownership map.
 
 ## Verification and local version control
 
-See [VERIFICATION.md](VERIFICATION.md) for the completed phases, affected files, compatibility details, test results, live-versus-fixture limits and a guided walkthrough.
+See [VERIFICATION.md](docs/VERIFICATION.md) for the completed phases, affected files, compatibility details, test results, live-versus-fixture limits and a guided walkthrough.
 
 ```sh
 pnpm test

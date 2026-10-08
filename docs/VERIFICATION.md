@@ -2,6 +2,16 @@
 
 Planmate keeps its vanilla architecture and travel scrapbook theme. Independent implementation work for the six requested phases is complete. Live provider validation remains incomplete because credentials are unconfigured. This report distinguishes implemented behavior, automated evidence and remaining release work.
 
+## Hackathon preparation review
+
+All original features and page URLs are retained. Browser pages/styles/scripts/assets now live in `public/`, browser/server rules in `shared/`, private implementation in `server/` and guides in `docs/`. The root launch entry remains `server.js`; root `data/`, browser storage keys and invitation formats are unchanged. Explicit public asset aliases preserve older URLs. Tests verify the aliases, root launch exports and private-file denial after the move.
+
+Added the themed `/demo.html` walkthrough and configuration-only connection status, linked from login/dashboard without replacing either page. Loading, empty/error, retry, safe new-tab links, 320/390px and desktop behavior were checked. The header wraps on narrow screens; the sample friends summary also wraps without overflowing.
+
+API fixes include `.env` loading for the Goa pilot, Google sign-in referrer/popup headers, and a direct Google Routes adapter that preserves the existing feed and manual buffers. In required-account mode, connected discovery requires verified sign-in. Fixture tests cover route request/source arithmetic, malformed/empty/rejected responses, feed precedence, credential privacy and status permissions. No live Google or event requests were made.
+
+Added `scripts/check-launch.js`, [API-CONNECTIONS.md](API-CONNECTIONS.md) and [HACKATHON.md](HACKATHON.md). The local public preflight intentionally reports four missing deployment settings: host binding, exact HTTPS origin, secure cookies and an absolute persistent data path. All five external services remain unconfigured. No public deployment is claimed.
+
 ## Completed behavior
 
 | Phase                       | Result and evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
@@ -15,13 +25,13 @@ Planmate keeps its vanilla architecture and travel scrapbook theme. Independent 
 
 ## Files added or updated
 
-New browser/rule modules: `form-drafts.js`, `dashboard-navigation.js`, `shared-sync.js`, `planner-ui.js`, `dashboard-renderers.js`, `place-illustrations.js`, `dashboard-responsive.css`, `account-client.js`, `profile-rules.js`, `planning-time.js`.
+New browser/rule modules: `public/js/form-drafts.js`, `public/js/dashboard-navigation.js`, `public/js/shared-sync.js`, `public/js/planner-ui.js`, `public/js/dashboard-renderers.js`, `public/js/place-illustrations.js`, `public/css/dashboard-responsive.css`, `public/js/account-client.js`, `shared/profile-rules.js`, `shared/planning-time.js`.
 
-New server/maintenance modules: `account-service.js`, `plan-store.js`, `scripts/backup.js`, `scripts/pilot-goa.js`. Module responsibilities and dependency order are in [MODULES.md](MODULES.md).
+New server/maintenance modules: `server/services/account-service.js`, `server/storage/plan-store.js`, `scripts/backup.js`, `scripts/pilot-goa.js`. Module responsibilities and dependency order are in [MODULES.md](MODULES.md).
 
-Updated integration files: dashboard/profile/login page wiring and logic, `browser-utils.js`, `profile-store.js`, `planner-core.js`, `planning-rules.js`, `group-fit.js`, `group-planning.js/css`, `outing-ui.js`, `memories-ui.js`, `discovery.js`, `media-store.js`, `server.js`, `public-files.js`, `shared.css`, `.env.example`, package scripts/lockfile, project link checks and Git/formatter exclusions.
+Updated integration files: dashboard/profile/login page wiring and logic, `public/js/browser-utils.js`, `public/js/profile-store.js`, `shared/planner-core.js`, `shared/planning-rules.js`, `shared/group-fit.js`, `public/js/group-planning.js`, `public/css/group-planning.css`, `public/js/outing-ui.js`, `public/js/memories-ui.js`, `server/services/discovery.js`, `server/services/media-store.js`, `server.js`, `server/public-files.js`, `public/css/shared.css`, `.env.example`, package scripts/lockfile, project link checks and Git/formatter exclusions.
 
-New or extended verification: draft, account, agreement, fit, overnight, synchronization, discovery and shared-server tests; eight cases in `tests/browser/`; `tests/server-fixture.js`; `.github/workflows/check.yml`. Documentation: README, this report, module map and [ACCOUNT-STORAGE.md](ACCOUNT-STORAGE.md).
+New or extended verification: draft, account, agreement, fit, overnight, synchronization, discovery and shared-server tests; nine cases in `tests/browser/`; `tests/server-fixture.js`; `.github/workflows/check.yml`. Documentation: README, this report, module map and [ACCOUNT-STORAGE.md](ACCOUNT-STORAGE.md).
 
 The reviewed dashboard was approximately 1,644 JavaScript and 1,967 CSS lines. Current dashboard composition is 1,725 JavaScript lines after adding accounts/draft adapters and extracting responsibilities. Base CSS is 1,567 lines with 401 responsive lines in a separate module. Line counts alone are not a measure of behavior or maintainability; the dependency boundaries and tests are the meaningful changes.
 
@@ -34,9 +44,9 @@ Backup/restore includes the database and referenced uploaded media, checksums an
 ## Commands and results
 
 - `pnpm install --frozen-lockfile`: pinned dependencies installed successfully.
-- `pnpm run check`: passed JavaScript syntax, page links, dependency order, 42 public files and formatting.
-- `pnpm test`: **100 tests passed, 0 failed**. Includes expense arithmetic, migration/restart/backup, account permissions, private drafts, discovery, recommendations, overnight boundaries, stale shared edits, route-result revocation and real PDF generation.
-- `PLANMATE_BROWSER_CHANNEL=chrome pnpm run test:browser`: **8 cases passed**: loading, profile-context, cohesion, planning, drafts, account, discovery-ui and night-fit. Environment variable syntax depends on the shell; on PowerShell use `$env:PLANMATE_BROWSER_CHANNEL='chrome'`.
+- `pnpm run check`: passed JavaScript syntax, page links, dependency order, 45 public files and formatting.
+- `pnpm test`: **106 tests passed, 0 failed**. Includes expense arithmetic, migration/restart/backup, account permissions, private drafts, discovery, recommendations, overnight boundaries, stale shared edits, route-result revocation and real PDF generation.
+- `PLANMATE_BROWSER_CHANNEL=chrome pnpm run test:browser`: **9 cases passed**: loading, profile-context, cohesion, planning, drafts, account, discovery-ui, night-fit and demo. Environment variable syntax depends on the shell; on PowerShell use `$env:PLANMATE_BROWSER_CHANNEL='chrome'`.
 - `pnpm run verify`: composes the same link/format, rule/server and browser checks. CI installs Playwright Chromium; local checks used installed Chrome. Screenshots are ignored under `test-results/`, with mobile/desktop layouts visually inspected.
 - `pnpm run check:pilot`: configuration-only Goa check made no billable requests; Places/events are false. Updated preview also reports unconfigured Google sign-in, maps and routes.
 - Git exclusion checks confirm credentials, saved data/media, databases, backups, dependencies and browser artifacts remain excluded. No remote push or deployment was performed.
@@ -52,3 +62,5 @@ Prepared CI has not run on a remote repository. Passing these checks does not pr
 5. Configure real credentials in `.env` following the README/account guide, restart, and then validate actual sign-in and run the opt-in Goa pilot. This remains release work. Public deployment also needs HTTPS, registered Google origins and durable storage; account deletion/recovery/retention policies need a deliberate release decision.
 
 Live events remain deferred until a real provider is configured. The adapter preserves actual dates, fixed starts and source/ticket links. No fabricated event inventory, prices, opening hours, coordinates or route times were added.
+
+The default Playwright Chromium download is absent on this workstation, and the local sandbox blocks browser process launches. Browser checks used installed Chrome with execution approval and disposable test contexts. The original eight cases passed; after the mobile changes, the new demo case and complete cohesion case passed. CI still installs its own Chromium. No failed product checks remain; real provider credentials and public deployment are the remaining external checks.

@@ -5,8 +5,9 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const { createPlannerServer } = require("./server-fixture");
-const catalogue = require("../catalogue");
-const publicFiles = require("../public-files");
+const catalogue = require("../shared/catalogue.js");
+const publicFiles = require("../server/public-files.js");
+const { resolvePublicFile } = require("../server/static-files.js");
 const trip = {
     title: "Our Goa trip",
     city: "Goa",
@@ -55,7 +56,7 @@ test("every linked browser file is served with the correct type and internal too
             );
             assert.equal(
                 await response.text(),
-                fs.readFileSync(path.join(__dirname, "..", file), "utf8"),
+                fs.readFileSync(resolvePublicFile(file).absolute, "utf8"),
                 file,
             );
         }

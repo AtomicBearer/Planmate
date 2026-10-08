@@ -2,14 +2,14 @@
 
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const Core = require("../planner-core");
-const catalogue = require("../catalogue");
-const exporter = require("../itinerary-export");
-require("../assets/vendor/regenerator-runtime");
+const Core = require("../shared/planner-core.js");
+const catalogue = require("../shared/catalogue.js");
+const exporter = require("../public/js/itinerary-export.js");
+require("../public/assets/vendor/regenerator-runtime");
 const libraries = {
-    PDFLib: require("../assets/vendor/pdf-lib.min.js"),
-    fontkit: require("../assets/vendor/fontkit.umd.min.js"),
-    fonts: require("../assets/pdf-fonts.js"),
+    PDFLib: require("../public/assets/vendor/pdf-lib.min.js"),
+    fontkit: require("../public/assets/vendor/fontkit.umd.min.js"),
+    fonts: require("../public/assets/pdf-fonts.js"),
 };
 function plan(changes = {}) {
     const state = Core.createState(

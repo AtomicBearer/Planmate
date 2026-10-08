@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="description"
+            content="See how Planmate helps friends agree on a trip, build an itinerary and share the outing."
+        />
+        <title>Planmate · Demo guide</title>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Patrick+Hand&amp;family=Permanent+Marker&amp;display=swap"
+        />
+        <link rel="stylesheet" href="css/shared.css" />
+        <link rel="stylesheet" href="css/personality.css" />
+        <link rel="stylesheet" href="css/demo.css" />
+        <script src="js/demo.js" defer></script>
+    </head>
+    <body>
+        <a class="demo-skip" href="#walkthrough">Skip to the walkthrough</a>
+        <main class="demo-page">
+            <nav class="demo-links" aria-label="Guide navigation">
+                <a href="login.html">Planmate ↗</a>
+                <a href="dashboard.html">Open the planner →</a>
+            </nav>
+            <header class="demo-hero">
+                <p class="demo-kicker">A little less group-chat chaos</p>
+                <h1>From “we should go”<br />to “see you there.”</h1>
+                <p
+                    >Turn a group’s interests, availability and budgets into a plan everyone can say
+                    yes to.</p
+                >
+                <p class="demo-caption"
+                    >A practical walkthrough for friends, teammates and hackathon judges.</p
+                >
+            </header>
+            <section id="walkthrough" aria-labelledby="walkthroughTitle">
+                <h2 id="walkthroughTitle">Try the whole journey</h2>
+                <p class="demo-intro"
+                    >Open the same invitation in two browsers or on two devices. Each friend has
+                    their own response; the organizer makes the final decisions.</p
+                >
+                <ol class="demo-steps">
+                    <li
+                        ><h3>When can we go?</h3
+                        ><p
+                            >Create a shared trip, invite a friend, then propose date windows in
+                            <strong>Dates & attendance</strong>. Answer from both browsers. Show
+                            common availability and choose the final date explicitly.</p
+                        ></li
+                    >
+                    <li
+                        ><h3>What suits everyone?</h3
+                        ><p
+                            >Save each member’s trip interests and budget in
+                            <strong>Plans that fit</strong>. Propose places from
+                            <strong>Explore places</strong>, respond Interested, Maybe or Pass, and
+                            discuss an idea in its comments.</p
+                        ></li
+                    >
+                    <li
+                        ><h3>What happens next?</h3
+                        ><p
+                            >Compare the Relaxed, More activities and Lower estimated cost drafts.
+                            Review the reasons and missing information, then explicitly apply a
+                            draft. Show the itinerary, travel buffers, reorder preview and PDF
+                            export.</p
+                        ></li
+                    >
+                    <li
+                        ><h3>Who is coming?</h3
+                        ><p
+                            >Reply <strong>I’m in</strong> or <strong>Maybe</strong> separately from
+                            place votes, then let the organizer confirm the plan. Make a material
+                            itinerary change to demonstrate the request to reconfirm.</p
+                        ></li
+                    >
+                    <li
+                        ><h3>How did the outing go?</h3
+                        ><p
+                            >Use <strong>Today’s plan</strong> for a trip happening today, or select
+                            a past trip day. Mark a stop visited, record an actual bill and a
+                            repayment, then add your own photo and caption in
+                            <strong>Our scrapbook</strong>.</p
+                        ></li
+                    >
+                </ol>
+            </section>
+            <section class="demo-status" aria-labelledby="connectionTitle">
+                <div class="demo-section-heading"
+                    ><h2 id="connectionTitle">What’s connected here?</h2
+                    ><button id="refreshConnections" type="button">Refresh status</button></div
+                >
+                <p
+                    >These are configuration checks. A configured service still needs a successful
+                    live test; this page does not make billable provider requests.</p
+                >
+                <p id="connectionMessage" role="status" aria-live="polite">Checking this server…</p>
+                <ul
+                    id="connectionList"
+                    class="connection-list"
+                    aria-label="Connection status"
+                    aria-busy="true"
+                ></ul>
+                <p class="demo-caption"
+                    >Availability, votes, draft recommendations and expense arithmetic use
+                    Planmate’s own rules. An external AI service is not required. Shared updates and
+                    private uploads need the running server.</p
+                >
+            </section>
+            <aside class="demo-footnote" aria-label="Demo expectations">
+                <h2>Show the promise honestly</h2>
+                <p
+                    >The sample plan, friends and costs are labelled demonstrations. Starter places
+                    are references, not verified live inventory. Unknown venue prices, opening
+                    hours, travel and ticket availability stay unknown until a real source supplies
+                    them.</p
+                >
+                <p
+                    >Use supplied estimates in your own trip. Connected routes are checked
+                    estimates, and fixed event times keep their published times. The group remains
+                    in control of every plan change.</p
+                >
+            </aside>
+            <footer
+                ><a href="dashboard.html">Ready? Open Planmate →</a
+                ><span>Made for plans worth sharing.</span></footer
+            >
+        </main>
+    </body>
+</html>

@@ -1,8 +1,8 @@
 "use strict";
 const { test } = require("node:test"),
     assert = require("node:assert/strict"),
-    C = require("../planner-core"),
-    catalogue = require("../catalogue");
+    C = require("../shared/planner-core.js"),
+    catalogue = require("../shared/catalogue.js");
 const trip = {
     title: "Friends in Goa",
     city: "Goa",

@@ -6,11 +6,11 @@
     --motion-ease: cubic-bezier(0.2, 0.75, 0.3, 1);
 }
 body {
-    background-image: url("assets/paper-grain.svg");
+    background-image: url("../assets/paper-grain.svg");
 }
 .main-shell,
 .profile-page {
-    background-image: url("assets/travel-background.svg"), url("assets/paper-grain.svg");
+    background-image: url("../assets/travel-background.svg"), url("../assets/paper-grain.svg");
     background-size:
         100% auto,
         120px 120px;
@@ -24,12 +24,12 @@ body {
     width: auto;
     height: auto;
     border-radius: 0;
-    background: url("assets/travel-background.svg") center top / 100% auto repeat-y;
+    background: url("../assets/travel-background.svg") center top / 100% auto repeat-y;
     opacity: 0.85;
     pointer-events: none;
 }
 .form-section {
-    background-image: url("assets/travel-background.svg"), url("assets/paper-grain.svg");
+    background-image: url("../assets/travel-background.svg"), url("../assets/paper-grain.svg");
     background-size:
         100% auto,
         120px 120px;
@@ -118,7 +118,7 @@ body {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: url("assets/paper-grain.svg");
+    background: url("../assets/paper-grain.svg");
 }
 .hero-artwork {
     position: relative;
@@ -177,7 +177,7 @@ body {
     bottom: 13px;
     width: 50px;
     height: 40px;
-    background: url("assets/travel-doodles.svg") 82% 4% / 230px auto;
+    background: url("../assets/travel-doodles.svg") 82% 4% / 230px auto;
     opacity: 0.6;
     pointer-events: none;
 }
@@ -218,7 +218,7 @@ body {
 .custom-callout {
     position: relative;
     border-style: dashed;
-    background-image: url("assets/paper-grain.svg");
+    background-image: url("../assets/paper-grain.svg");
 }
 .custom-callout strong {
     display: inline-block;
@@ -335,7 +335,7 @@ body {
 }
 .identity-card {
     background-image:
-        url("assets/paper-grain.svg"), radial-gradient(circle at 50% 0, #fffaf0, transparent 62%);
+        url("../assets/paper-grain.svg"), radial-gradient(circle at 50% 0, #fffaf0, transparent 62%);
 }
 .profile-panel {
     box-shadow: 0 4px 0 #eadfce4a;

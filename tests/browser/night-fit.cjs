@@ -2,7 +2,7 @@
 const assert = require("node:assert/strict"),
     { launchBrowser } = require("./helpers.cjs"),
     { createPlannerServer } = require("../server-fixture"),
-    catalogue = require("../../catalogue");
+    catalogue = require("../../shared/catalogue.js");
 (async () => {
     const server = createPlannerServer({
         dataFile: null,
