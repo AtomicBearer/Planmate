@@ -1,5 +1,7 @@
 data/
 node_modules/
+# Local nested checkout; the deployable application lives at this repository root.
+/Planmate/
 .netlify/
 .pnpm-store/
 .env
