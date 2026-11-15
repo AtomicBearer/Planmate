@@ -13,11 +13,13 @@ const { createAccounts } = require("./services/account-service.js");
 const Profile = require("../shared/profile-rules.js");
 const { resolvePublicFile } = require("./static-files.js");
 const { describeIntegrations } = require("./services/integrations.js");
+const { publicOrigin } = require("./deployment-config.js");
 const MIME = {
     ".html": "text/html; charset=utf-8",
     ".css": "text/css; charset=utf-8",
     ".js": "text/javascript; charset=utf-8",
     ".svg": "image/svg+xml",
+    ".ttf": "font/ttf",
 };
 const digest = (token) => crypto.createHash("sha256").update(token).digest("hex");
 function createPlannerServer({
@@ -62,6 +64,8 @@ function createPlannerServer({
         if (!request.headers["content-type"]?.startsWith("application/json"))
             fail(415, "Send JSON data.");
         let raw = "";
+        // Decode across chunk boundaries so Indian-language names remain intact.
+        request.setEncoding("utf8");
         for await (const chunk of request) {
             raw += chunk;
             if (Buffer.byteLength(raw) > 65536) fail(413, "This change is too large.");
@@ -118,13 +122,13 @@ function createPlannerServer({
         response.setHeader("X-Frame-Options", "DENY");
         response.setHeader(
             "Content-Security-Policy",
-            "default-src 'self'; script-src 'self' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://accounts.google.com; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+            "default-src 'self'; script-src 'self' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://accounts.google.com; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
         );
         try {
             const url = new URL(request.url, "http://localhost");
             if (url.pathname.startsWith("/api/")) {
                 database = store.snapshot();
-                const allowedOrigin = (accountOptions?.env ?? process.env).PUBLIC_ORIGIN;
+                const allowedOrigin = publicOrigin(accountOptions?.env ?? process.env);
                 if (
                     allowedOrigin &&
                     request.headers.origin &&
@@ -209,6 +213,7 @@ function createPlannerServer({
                         storage: "sqlite-single-host",
                         verifiedSignInConfigured: accounts.configured,
                         planningFeatures: 2,
+                        map: maps.config(),
                     });
                 if (url.pathname === "/api/integrations/status" && request.method === "GET")
                     return json(
@@ -634,7 +639,7 @@ function createPlannerServer({
     server.on("close", () => store.close());
     return server;
 }
-function start() {
+function start({ signals = process } = {}) {
     const port = Number(process.env.PORT || 3000),
         host = process.env.HOST || (process.argv.includes("--lan") ? "0.0.0.0" : "127.0.0.1");
     const server = createPlannerServer();
@@ -644,9 +649,26 @@ function start() {
     });
     server.listen(port, host, () =>
         console.log(
-            `Planmate is ready at http://localhost:${port}/dashboard.html\n${host === "0.0.0.0" ? "LAN mode: friends on your network can use this computer’s network address." : "Local mode: use separate browsers to try shared planning. pnpm run start:lan enables other devices."}`,
+            publicOrigin()
+                ? `Planmate is ready at ${publicOrigin()}`
+                : `Planmate is ready at http://localhost:${server.address().port}/\n${host === "0.0.0.0" ? "LAN mode: friends on your network can use this computer’s network address." : "Local mode: use separate browsers to try shared planning. pnpm run start:lan enables other devices."}`,
         ),
     );
+    let shuttingDown = false;
+    function shutdown() {
+        if (shuttingDown) return;
+        shuttingDown = true;
+        console.log("Finishing requests and closing Planmate storage…");
+        const deadline = setTimeout(() => server.closeAllConnections(), 20000);
+        deadline.unref();
+        server.close(() => clearTimeout(deadline));
+    }
+    signals.once("SIGTERM", shutdown);
+    signals.once("SIGINT", shutdown);
+    server.once("close", () => {
+        signals.removeListener("SIGTERM", shutdown);
+        signals.removeListener("SIGINT", shutdown);
+    });
     return server;
 }
 if (require.main === module) start();

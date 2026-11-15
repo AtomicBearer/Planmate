@@ -97,6 +97,7 @@
         return {
             trip,
             days,
+            journeys: Core.clone(state.journeys || []).sort((a, b) => (a.departureDate + a.departureTime).localeCompare(b.departureDate + b.departureTime)),
             members: Core.clone(state.members),
             total: ordered.reduce((sum, stop) => sum + stop.cost, 0),
             unknownCosts: ordered.filter((stop) => !stop.costKnown).length,
@@ -535,6 +536,22 @@
                 );
             }
             day.stops.forEach((stop, index) => stopCard(day, stop, index + 1));
+        }
+        for (const leg of model.journeys) {
+            page = document.addPage([WIDTH, HEIGHT]);
+            box(0, 0, WIDTH, HEIGHT, "paper");
+            text("TRAIN JOURNEY · " + leg.status.toUpperCase(), MARGIN, 45, 10, "sage");
+            let top = textLines(wrap(leg.from + " → " + leg.to, WIDTH - MARGIN * 2, 28, "heading"), MARGIN, 80, 28, 34, "ink", "heading") + 24;
+            const lines = [
+                leg.train || "Train name / number to be confirmed",
+                "Departure: " + leg.departureDate + " · " + (leg.departureTime ? time(leg.departureTime) : "Time unknown") + " IST",
+                "Arrival: " + leg.arrivalDate + " · " + (leg.arrivalTime ? time(leg.arrivalTime) : "Time unknown") + " IST",
+                "Manually entered by the group. Check your ticket for the current timetable.",
+                "Rail fares are not included in the activity cost total.",
+                leg.note || ""
+            ];
+            for (const value of lines)
+                top = textLines(wrap(value, WIDTH - MARGIN * 2, 11), MARGIN, top, 11, 16, "ink") + 16;
         }
         const count = document.getPageCount();
         for (const [index, current] of document.getPages().entries()) {

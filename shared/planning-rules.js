@@ -20,6 +20,7 @@
     function migrate(original) {
         const s = copy(original);
         s.featuresVersion = 2;
+        s.journeys ||= [];
         s.organizerId ||= s.members[0]?.id;
         s.trip.timezone ||= "Asia/Kolkata";
         s.materialVersion ??= 0;
@@ -42,6 +43,7 @@
             s.members.filter((m) => !m.removed).map((m) => m.id),
             [s.trip.city, s.trip.start, s.trip.end, s.trip.budget, s.trip.timezone],
             s.availability.chosen,
+            [...(s.journeys || [])].sort((a, b) => a.id.localeCompare(b.id)),
             [...s.stops]
                 .sort((a, b) => a.id.localeCompare(b.id))
                 .map((p) => [

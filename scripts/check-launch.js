@@ -1,5 +1,6 @@
 "use strict";
 const path = require("node:path");
+const { publicOrigin } = require("../server/deployment-config.js");
 function httpsEndpoint(value) {
     try {
         const url = new URL(value);
@@ -9,14 +10,12 @@ function httpsEndpoint(value) {
     }
 }
 function checkLaunch(env = process.env) {
+    const origin = publicOrigin(env);
     const errors = [],
         warnings = [];
     if (env.HOST !== "0.0.0.0")
         errors.push("Set HOST=0.0.0.0 so the host can reach the Node server.");
-    if (
-        !httpsEndpoint(env.PUBLIC_ORIGIN) ||
-        new URL(env.PUBLIC_ORIGIN).origin !== env.PUBLIC_ORIGIN
-    )
+    if (!httpsEndpoint(origin) || new URL(origin).origin !== origin)
         errors.push(
             "Set PUBLIC_ORIGIN to the exact public HTTPS origin, without a path or trailing slash.",
         );
@@ -24,7 +23,7 @@ function checkLaunch(env = process.env) {
         errors.push("Set SESSION_SECURE=true for public HTTPS sign-in.");
     if (env.ACCOUNT_MODE !== "required")
         warnings.push(
-            "Guest access is enabled: names are unverified and discovery is public. Set ACCOUNT_MODE=required for verified public accounts.",
+            "Guest mode: device profiles and invitation memberships work without API keys. Names are unverified; personal profiles do not sync across devices.",
         );
     if (
         env.ACCOUNT_MODE === "required" &&
@@ -57,7 +56,7 @@ function checkLaunch(env = process.env) {
     if (!env.EVENTS_FEED_URL && !env.TICKETMASTER_API_KEY)
         warnings.push("Live events are unconfigured; no listings will be fabricated.");
     warnings.push(
-        "Confirm persistent disk, one running Node instance, registered Google origins and provider quotas on the host. Configuration checks do not test live credentials.",
+        "Confirm persistent disk and one running Node instance on the host. Optional configured providers need separate live checks; they are not needed for guest planning.",
     );
     return { errors, warnings };
 }
@@ -71,7 +70,7 @@ if (require.main === module) {
     console.log(
         errors.length
             ? `${errors.length} public configuration issue(s) remain.`
-            : "Configuration checks passed. Test the deployed journey before presenting.",
+            : "Configuration checks passed. Test the deployed URL before publishing it.",
     );
     process.exitCode = errors.length ? 1 : 0;
 }

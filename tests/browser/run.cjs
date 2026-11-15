@@ -11,6 +11,7 @@ const cases = [
     "discovery-ui",
     "night-fit",
     "product",
+    "netlify-upload",
 ];
 (async () => {
     const selected = process.argv.slice(2).filter((argument) => argument !== "--");

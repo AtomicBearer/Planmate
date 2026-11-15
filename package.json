@@ -9,11 +9,14 @@
     "scripts": {
         "start": "node --env-file-if-exists=.env server.js",
         "start:lan": "node --env-file-if-exists=.env server.js --lan",
+        "build:netlify": "node scripts/build-netlify.js",
+        "build:netlify:shared": "node scripts/build-netlify.js --shared",
         "test": "node --test --test-isolation=none tests/*.test.js",
         "check:links": "node scripts/check-project.js",
         "check": "node scripts/check-project.js && prettier --check .",
         "format": "prettier --write .",
         "prepare:pdf": "node scripts/prepare-pdf-assets.js",
+        "prepare:fonts": "node scripts/prepare-web-fonts.js",
         "test:browser": "node tests/browser/run.cjs",
         "verify": "pnpm run check && pnpm test && pnpm run test:browser",
         "check:pilot": "node --env-file-if-exists=.env scripts/pilot-goa.js",
@@ -27,6 +30,7 @@
         "regenerator-runtime": "0.14.1"
     },
     "dependencies": {
+        "@netlify/blobs": "11.1.9",
         "google-auth-library": "11.1.0",
         "sharp": "0.35.5"
     },

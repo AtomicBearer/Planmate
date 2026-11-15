@@ -129,11 +129,44 @@ async function handleCredentialResponse(response) {
         showToast("Sign-in unavailable", error.message, "!");
     }
 }
+function loadGoogleSignIn() {
+    if (window.google?.accounts?.id) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+        const script = document.createElement("script"),
+            timer = setTimeout(
+                () => finish(new Error("Google sign-in could not load. Reload to retry.")),
+                10000,
+            );
+        function finish(error) {
+            clearTimeout(timer);
+            script.onload = script.onerror = null;
+            if (error) reject(error);
+            else if (window.google?.accounts?.id) resolve();
+            else reject(new Error("Google sign-in could not load. Reload to retry."));
+        }
+        script.src = "https://accounts.google.com/gsi/client";
+        script.async = true;
+        script.onload = () => finish();
+        script.onerror = () =>
+            finish(new Error("Google sign-in could not load. Reconnect and reload."));
+        document.head.append(script);
+    });
+}
 if (window.PlanmateAccount)
     (async () => {
         await window.PlanmateAccount.ready;
         const cfg = window.PlanmateAccount.config(),
-            status = document.getElementById("accountStatus");
+            status = document.getElementById("accountStatus"),
+            signIn = document.getElementById("accountSignIn");
+        if (window.PlanmateSite?.deviceOnly) {
+            document.getElementById("localProfileNote").textContent =
+                "Your profile and personal plans stay in this browser. Names are not verified. Shared invitations and photo uploads need the full server version.";
+            document.querySelector(".signup-text").textContent =
+                "Create your own trip on the dashboard. Your plans start empty.";
+            document.querySelector(".preview-members p").textContent =
+                "Create a personal trip and make it yours";
+        }
+        signIn.hidden = !cfg.configured && !cfg.required && !window.PlanmateAccount.error();
         status.textContent =
             window.PlanmateAccount.error() ||
             (cfg.configured
@@ -145,32 +178,11 @@ if (window.PlanmateAccount)
             document.getElementById("localProfileNote").hidden = true;
         }
         if (!cfg.configured) return;
+        document.getElementById("localProfileNote").textContent =
+            "These details stay on this device. Sign in with Google to access your private profile and account trips across devices.";
         try {
             const challenge = await window.PlanmateAccount.call("/api/auth/challenge");
-            if (!window.google?.accounts?.id)
-                await new Promise((resolve, reject) => {
-                    const script = document.querySelector(
-                        'script[src="https://accounts.google.com/gsi/client"]',
-                    );
-                    script.addEventListener("load", resolve, { once: true });
-                    script.addEventListener(
-                        "error",
-                        () =>
-                            reject(
-                                new Error("Google sign-in could not load. Reconnect and reload."),
-                            ),
-                        { once: true },
-                    );
-                    setTimeout(
-                        () =>
-                            window.google?.accounts?.id
-                                ? resolve()
-                                : reject(
-                                      new Error("Google sign-in could not load. Reload to retry."),
-                                  ),
-                        10000,
-                    );
-                });
+            await loadGoogleSignIn();
             window.google.accounts.id.initialize({
                 client_id: cfg.clientId,
                 nonce: challenge.nonce,

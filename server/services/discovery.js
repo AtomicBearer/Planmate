@@ -41,9 +41,10 @@ function httpsUrl(value) {
         return "";
     }
 }
-function createDiscovery({ env = process.env, fetchImpl = globalThis.fetch, now = Date.now } = {}) {
-    const secret = crypto.randomBytes(32),
-        sessions = new Map();
+function createDiscovery({ env = process.env, fetchImpl = globalThis.fetch, now = Date.now,
+    signingSecret, sessionStore } = {}) {
+    const secret = signingSecret || crypto.randomBytes(32),
+        sessions = sessionStore || new Map();
     const key = env.GOOGLE_PLACES_API_KEY;
     const feed = httpsUrl(env.EVENTS_FEED_URL);
     const ticketKey = env.TICKETMASTER_API_KEY;
@@ -161,14 +162,17 @@ function createDiscovery({ env = process.env, fetchImpl = globalThis.fetch, now 
             );
         const criteria = validateSearch(params),
             signature = JSON.stringify(criteria);
-        for (const [id, session] of sessions) if (session.expires < now()) sessions.delete(id);
+        if (!sessionStore)
+            for (const [id, session] of sessions) if (session.expires < now()) sessions.delete(id);
         let session,
             cursor = params.get("cursor");
         if (cursor) {
-            session = sessions.get(cursor);
-            if (!session || session.signature !== signature)
+            if (!/^[a-f0-9]{40}$/.test(cursor)) throw error(400, "Invalid search cursor.");
+            session = await sessions.get(cursor);
+            if (!session || session.expires < now() || session.signature !== signature)
                 throw error(410, "This search expired. Start a new search.");
-            if (session.busy) throw error(409, "This search is still loading.");
+            if (session.busy && (!session.busyUntil || session.busyUntil > now()))
+                throw error(409, "This search is still loading.");
         } else {
             if (sessions.size >= 500) throw error(429, "Discovery is busy. Try again shortly.");
             const entries =
@@ -182,9 +186,11 @@ function createDiscovery({ env = process.env, fetchImpl = globalThis.fetch, now 
                   );
             cursor = crypto.randomBytes(20).toString("hex");
             session = { signature, jobs, seen: new Set(), expires: now() + 600000, busy: false };
-            sessions.set(cursor, session);
+            await sessions.set(cursor, session);
         }
         session.busy = true;
+        session.busyUntil = now() + 30000;
+        if (sessionStore) await sessions.set(cursor, session);
         try {
             const jobs = session.jobs.slice(0, 3);
             const results = await Promise.allSettled(
@@ -233,7 +239,7 @@ function createDiscovery({ env = process.env, fetchImpl = globalThis.fetch, now 
                 throw error(502, warnings[0]);
             session.expires = now() + 600000;
             const more = session.jobs.length > 0;
-            if (!more) sessions.delete(cursor);
+            if (!more && !sessionStore) sessions.delete(cursor);
             return {
                 places: found,
                 cursor: more ? cursor : "",
@@ -246,6 +252,7 @@ function createDiscovery({ env = process.env, fetchImpl = globalThis.fetch, now 
             };
         } finally {
             session.busy = false;
+            if (sessionStore) await sessions.set(cursor, session);
         }
     }
     async function details(params) {

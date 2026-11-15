@@ -13,11 +13,12 @@ function createMapService({
     env = process.env,
     fetchImpl = globalThis.fetch,
     now = Date.now,
+    imageStore,
 } = {}) {
     const key = env.GOOGLE_STATIC_MAPS_API_KEY,
         routeKey = env.GOOGLE_ROUTES_API_KEY,
         routeFeed = https(env.ROUTES_FEED_URL),
-        images = new Map();
+        images = imageStore || new Map();
     const config = () => ({
         googleMap: Boolean(key),
         routes: Boolean(routeFeed || routeKey),
@@ -135,15 +136,17 @@ function createMapService({
                 key,
             }).toString();
             const token = crypto.randomBytes(24).toString("base64url");
-            for (const [t, v] of images) if (v.expires < now()) images.delete(t);
+            if (!imageStore)
+                for (const [t, v] of images) if (v.expires < now()) images.delete(t);
             if (images.size >= 200) throw new Error("Map previews are busy; try again shortly.");
-            images.set(token, { url: url.href, group, expires: now() + 600000 });
+            await images.set(token, { url: url.href, group, expires: now() + 600000 });
             result.imageToken = token;
         }
         return result;
     }
     async function image(token, group) {
-        const resource = images.get(token);
+        if (!/^[A-Za-z0-9_-]{32}$/.test(token || "")) throw new Error("Invalid map reference.");
+        const resource = await images.get(token);
         if (!resource || resource.group !== group || resource.expires < now())
             throw new Error("Map preview expired. Refresh this day.");
         const response = await fetchImpl(resource.url, {

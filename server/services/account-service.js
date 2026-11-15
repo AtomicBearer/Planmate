@@ -2,6 +2,7 @@
 "use strict";
 const crypto = require("node:crypto"),
     { OAuth2Client } = require("google-auth-library");
+const { publicOrigin: deploymentOrigin } = require("../deployment-config.js");
 const hash = (v) => crypto.createHash("sha256").update(v).digest("hex"),
     random = () => crypto.randomBytes(32).toString("base64url");
 function fail(status, message) {
@@ -27,7 +28,7 @@ function createAccounts(store, { env = process.env, verify, now = Date.now } = {
             "ACCOUNT_MODE=required needs GOOGLE_CLIENT_ID. Guest access is disabled in required mode.",
         );
     const client = new OAuth2Client(clientId),
-        publicOrigin = env.PUBLIC_ORIGIN || "",
+        publicOrigin = deploymentOrigin(env),
         db = store.db;
     if (required && publicOrigin && !/^https:\/\//.test(publicOrigin))
         throw new Error("Public account deployments require an HTTPS PUBLIC_ORIGIN.");

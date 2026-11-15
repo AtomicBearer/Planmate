@@ -44,6 +44,7 @@ test("every linked browser file is served with the correct type and internal too
         ".css": "text/css",
         ".js": "text/javascript",
         ".svg": "image/svg+xml",
+        ".ttf": "font/ttf",
     };
     try {
         for (const file of publicFiles) {
@@ -54,9 +55,9 @@ test("every linked browser file is served with the correct type and internal too
                 types[path.extname(file)],
                 file,
             );
-            assert.equal(
-                await response.text(),
-                fs.readFileSync(resolvePublicFile(file).absolute, "utf8"),
+            assert.deepEqual(
+                Buffer.from(await response.arrayBuffer()),
+                fs.readFileSync(resolvePublicFile(file).absolute),
                 file,
             );
         }

@@ -11,6 +11,7 @@ const publicSet = new Set(publicFiles);
 const references = new Set();
 const problems = [];
 const dependencies = {
+    "account-client.js": ["site-mode.js"],
     "group-fit.js": ["planning-time.js"],
     "form-drafts.js": ["browser-utils.js"],
     "planning-rules.js": [
@@ -19,7 +20,9 @@ const dependencies = {
         "outing-rules.js",
         "expense-rules.js",
     ],
-    "planner-core.js": ["planning-rules.js"],
+    "planner-core.js": ["planning-rules.js", "train-rules.js", "chikkamagaluru.js"],
+    "catalogue.js": ["chikkamagaluru.js"],
+    "train-ui.js": ["planner-core.js", "browser-utils.js"],
     "planning-spaces.js": ["planner-core.js"],
     "group-planning.js": [
         "planner-ui.js",
@@ -28,6 +31,7 @@ const dependencies = {
         "profile-store.js",
         "outing-ui.js",
         "memories-ui.js",
+        "train-ui.js",
     ],
     "outing-ui.js": ["planner-core.js", "browser-utils.js"],
     "memories-ui.js": ["planner-core.js", "browser-utils.js"],

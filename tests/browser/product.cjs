@@ -14,8 +14,28 @@ const assert = require("node:assert/strict"),
             reducedMotion: "reduce",
         });
         const page = await context.newPage(),
-            errors = [];
+            errors = [],
+            externalRequests = [];
         page.on("pageerror", (error) => errors.push(error.message));
+        page.on("request", (request) => {
+            if (new URL(request.url()).origin !== origin) externalRequests.push(request.url());
+        });
+        await page.goto(origin + "/");
+        await page.evaluate(async () => {
+            await window.PlanmateAccount.ready;
+            await document.fonts.ready;
+        });
+        assert.equal(await page.locator("#accountSignIn").isVisible(), false);
+        assert.equal(
+            await page.locator('script[src="https://accounts.google.com/gsi/client"]').count(),
+            0,
+        );
+        assert.equal(await page.getByText("Weekend Hangout").count(), 0);
+        assert.equal(await page.evaluate(() => document.fonts.check('16px "Patrick Hand"')), true);
+        await page.screenshot({
+            path: "test-results/product-login-local-fonts.png",
+            fullPage: true,
+        });
         await page.goto(origin + "/dashboard.html");
         await page.getByRole("heading", { name: "Your next adventure starts here" }).waitFor();
         assert.equal(await page.locator(".hero").isVisible(), false);
@@ -127,8 +147,18 @@ const assert = require("node:assert/strict"),
         await page.getByRole("heading", { name: "Earlier saved trip", exact: true }).waitFor();
         for (const route of ["/demo.html", "/css/demo.css", "/js/demo.js", "/demo.js"])
             assert.equal((await fetch(origin + route)).status, 404);
-        const fresh = await browser.newContext({ viewport: { width: 320, height: 844 } });
+        const fresh = await browser.newContext({
+            viewport: { width: 320, height: 844 },
+            reducedMotion: "reduce",
+        });
         const mobile = await fresh.newPage();
+        await mobile.goto(origin + "/");
+        await mobile.evaluate(() => document.fonts.ready);
+        assert.equal(
+            await mobile.evaluate(() => document.documentElement.scrollWidth > innerWidth),
+            false,
+        );
+        await mobile.screenshot({ path: "test-results/product-login-320.png", fullPage: true });
         await mobile.goto(origin + "/dashboard.html");
         await mobile.getByRole("heading", { name: "Your next adventure starts here" }).waitFor();
         assert.equal(
@@ -138,8 +168,49 @@ const assert = require("node:assert/strict"),
         await mobile.screenshot({ path: "test-results/product-start-320.png", fullPage: true });
         await fresh.close();
         assert.deepEqual(errors, []);
+        assert.deepEqual(externalRequests, []);
+        // Optional verified sign-in still works when deliberately configured.
+        // Intercept the SDK; this verifies loading/error behavior without Google calls.
+        const accounts = await browser.newContext();
+        let required = false;
+        await accounts.route("**/api/auth/config", (route) =>
+            route.fulfill({
+                json: {
+                    configured: true,
+                    required,
+                    mode: required ? "required" : "guest",
+                    clientId: "123-fixture.apps.googleusercontent.com",
+                },
+            }),
+        );
+        await accounts.route("**/api/auth/challenge", (route) =>
+            route.fulfill({ json: { nonce: "test-nonce" } }),
+        );
+        await accounts.route("https://accounts.google.com/gsi/client", (route) =>
+            route.fulfill({
+                contentType: "text/javascript",
+                body: "window.google={accounts:{id:{initialize(c){window.testNonce=c.nonce},renderButton(node){node.textContent='Configured sign-in button'}}}};",
+            }),
+        );
+        const providerPage = await accounts.newPage();
+        providerPage.on("pageerror", (error) => errors.push(error.message));
+        await providerPage.goto(origin + "/");
+        await providerPage.getByText("Configured sign-in button").waitFor();
+        assert.equal(await providerPage.locator("#accountSignIn").isVisible(), true);
+        assert.equal(await providerPage.evaluate(() => window.testNonce), "test-nonce");
+        required = true;
+        await providerPage.route("https://accounts.google.com/gsi/client", (route) =>
+            route.abort(),
+        );
+        await providerPage.reload();
+        await providerPage
+            .getByText("Google sign-in could not load. Reconnect and reload.")
+            .waitFor();
+        assert.equal(await providerPage.locator("#loginForm").isVisible(), false);
+        assert.deepEqual(errors, []);
+        await accounts.close();
         console.log(
-            "PASS product: clean start, useful empty sections, actual trip creation/reload, real member identity, saved-plan compatibility, removed presentation routes and 390/320px layouts.",
+            "PASS product: empty start, guest creation/reload, saved-plan compatibility, local fonts/no external requests, optional sign-in loading/error states and 390/320px layouts.",
         );
     } finally {
         await browser.close();

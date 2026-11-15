@@ -25,7 +25,7 @@
         return result;
     }
     const ready = (async () => {
-        if (location.protocol === "file:") return;
+        if (location.protocol === "file:" || window.PlanmateSite?.deviceOnly) return;
         try {
             config = await call("/api/auth/config");
             user = (await call("/api/auth/session")).account;

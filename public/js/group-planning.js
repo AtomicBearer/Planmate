@@ -14,6 +14,7 @@
         const host = () => state().organizerId === me();
         const Fit = R.fit;
         const outingUI = window.OutingUI.init(a, { button, field, panel, notice, run });
+        const trainUI = window.TrainUI.init(a, { field, panel, notice, run });
         const memoriesUI = window.MemoriesUI.init(a, { button, field, panel, notice, run });
         function prefForm() {
             const p = state().preferences[me()] || {
@@ -229,6 +230,7 @@
                 .forEach(addEstimateCheckbox);
             outingUI.render(view);
             memoriesUI.render(view);
+            trainUI.render(view);
         }
         async function run(type, payload, message = "Saved for the group.") {
             if (saving) throw new Error("Wait for your current change to finish.");

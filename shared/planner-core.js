@@ -1,9 +1,9 @@
 /* Shared planning rules, used by both the browser and the local server. */
 (function (root, factory) {
     if (typeof module === "object" && module.exports)
-        module.exports = factory(require("./planning-rules.js"));
-    else root.PlannerCore = factory(root.PlanningRules);
-})(typeof globalThis !== "undefined" ? globalThis : this, function (Rules) {
+        module.exports = factory(require("./planning-rules.js"), require("./train-rules.js"), require("./chikkamagaluru.js"));
+    else root.PlannerCore = factory(root.PlanningRules, root.TrainRules, root.Chikkamagaluru);
+})(typeof globalThis !== "undefined" ? globalThis : this, function (Rules, Trains, Region) {
     "use strict";
     const categories = ["Beach", "Food", "Nightlife", "Sights", "Outdoors", "Event"];
     const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -77,7 +77,7 @@
         const result = {
             id: text(value.id, "Place ID", 100),
             name: text(value.name, "Place name", 100),
-            city: text(value.city, "City", 60),
+            city: canonicalCity(text(value.city, "City", 60)),
             area: text(value.area || value.city, "Area", 100),
             category: value.category,
             description: text(
@@ -89,6 +89,8 @@
             source: safeUrl(value.source || ""),
             custom: Boolean(value.custom),
         };
+        const regional = Region.places.find((p) => p.id === result.id);
+        if (regional) return clone(regional);
         if (value.provider) result.provider = text(value.provider, "Provider", 40);
         if (value.provider === "google") {
             check(/^google-[A-Za-z0-9_-]{1,80}$/.test(result.id), "Choose a valid Google place.");
@@ -345,8 +347,9 @@
                 break;
             }
             default:
-                check(Rules.execute(state, command, memberId, api), "Unknown planning action.");
+                check(Trains.execute(state, command, memberId, api) || Rules.execute(state, command, memberId, api), "Unknown planning action.");
         }
+        Trains.validateSchedule(state, api);
         Rules.finish(state, before);
         state.revision += 1;
         state.updatedAt = new Date().toISOString();
@@ -357,7 +360,7 @@
         dates(value.start, value.end);
         return {
             title: text(value.title, "Trip name", 100),
-            city: text(value.city, "City", 60),
+            city: canonicalCity(text(value.city, "City", 60)),
             start: value.start,
             end: value.end,
             budget: number(value.budget ?? 5000, "Budget per person", 0, 1000000),
@@ -389,7 +392,12 @@
         }
         return value;
     }
+    function canonicalCity(city) {
+        return [Region.city, ...Region.aliases].some((alias) => alias.toLowerCase() === city.trim().toLowerCase()) ? Region.city : city;
+    }
     const api = {
+        canonicalCity,
+        trains: Trains,
         categories,
         clone,
         check,

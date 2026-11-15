@@ -8,24 +8,13 @@
 
         <title>Planmate | Start planning</title>
 
-        <!-- Patrick Hand font -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Permanent+Marker&display=swap"
-            rel="stylesheet"
-        />
-
         <!-- Our CSS -->
         <link rel="stylesheet" href="css/shared.css" />
         <link rel="stylesheet" href="css/login.css" />
         <link rel="stylesheet" href="css/personality.css" />
         <script src="js/motion.js" defer></script>
+        <script src="js/site-mode.js" defer></script>
         <script src="js/account-client.js" defer></script>
-
-        <!--
-        Google Identity Services library.
-        Server-verified Google sign-in; configured client ID is loaded from the server.
-    -->
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
     </head>
 
     <body>
@@ -62,36 +51,33 @@
                         />
                         <span class="paper-sticker sage">let’s go ↗</span>
                     </div>
-                    <!-- Decorative travel card -->
+                    <!-- A blank welcome card; no trip or members are generated. -->
                     <div class="plan-preview">
                         <div class="preview-top">
                             <div>
-                                <small>Example plan</small>
-                                <h3>Weekend Hangout 🎉</h3>
+                                <small>Your first plan</small>
+                                <h3>Start with your people ♡</h3>
                             </div>
 
-                            <span class="status"> Choosing a date </span>
+                            <span class="status"> Ready when you are </span>
                         </div>
 
                         <div class="preview-members">
                             <div class="avatars">
-                                <span>A</span>
-                                <span>R</span>
-                                <span>S</span>
-                                <span>+3</span>
+                                <span>♡</span>
+                                <span>↗</span>
+                                <span>✦</span>
                             </div>
 
-                            <p>6 friends planning together</p>
+                            <p>Create a trip and invite your friends</p>
                         </div>
 
                         <div class="progress-title">
-                            <span>Availability responses</span>
-                            <strong>5 of 6</strong>
+                            <span>Agree on a date, then build your itinerary</span>
+                            <strong>→</strong>
                         </div>
 
-                        <div class="progress-bar">
-                            <div class="progress"></div>
-                        </div>
+                        <div class="progress-bar" aria-hidden="true"></div>
                     </div>
                 </div>
 
@@ -116,16 +102,15 @@
 
                         <p>Your people. Your plans. Your next adventure.</p>
                     </div>
-
-                    <!-- Server-configured verified sign-in -->
-
-                    <p id="accountStatus" role="status">Checking verified sign-in…</p>
-                    <div class="google-wrapper" id="googleSignIn"></div>
-                    <!-- Divider -->
-                    <div class="divider">
-                        <span></span>
-                        <p>or continue on this device</p>
-                        <span></span>
+                    <!-- Only shown when verified account sign-in is configured. -->
+                    <div id="accountSignIn" hidden>
+                        <p id="accountStatus" role="status"></p>
+                        <div class="google-wrapper" id="googleSignIn"></div>
+                        <div class="divider">
+                            <span></span>
+                            <p>or continue on this device</p>
+                            <span></span>
+                        </div>
                     </div>
 
                     <!-- =====================
@@ -207,8 +192,8 @@
                         Create a trip or join through a friend’s invitation on the dashboard.
                     </p>
                     <p class="privacy-note device-note" id="localProfileNote">
-                        These details stay on this device. Sign in with Google to access your
-                        private profile and account trips across devices.
+                        These details stay on this device. This is a device profile; your name is
+                        not verified. Join shared trips through a private invitation.
                     </p>
                 </div>
             </section>

@@ -1,7 +1,8 @@
 (() => {
     "use strict";
     const C = window.PlannerCore,
-        catalogue = window.PlannerCatalogue;
+        catalogue = window.PlannerCatalogue,
+        deviceOnly = Boolean(window.PlanmateSite?.deviceOnly);
     const navigation = new URLSearchParams(location.search);
     const incomingGroup = navigation.get("group");
     const requestedPlanCity = navigation.get("planCity");
@@ -76,7 +77,8 @@
         currentSpace,
         groupCode = "",
         groupToken = "",
-        serverAvailable = false;
+        serverAvailable = false,
+        routesAvailable = false;
     let view = requestedView,
         city = "Goa",
         category = "All",
@@ -104,6 +106,7 @@
         ],
     };
     const liveRecords = new Map();
+    let regionCluster = "All", regionEvidence = "All";
     let liveContext = null,
         eventFrom = "",
         eventTo = "",
@@ -173,11 +176,15 @@
                 ? eventMode
                     ? "Search comedy, music, festivals and more for your chosen dates."
                     : "Browse beaches, cafés, food, nightlife, sights and outdoors. Keep loading to explore more of the city."
-                : location.protocol === "file:" || !serverAvailable
-                  ? "Open this dashboard through the planning server to use live discovery."
-                  : eventMode
-                    ? "Live events need a connected city events feed. You can still add an event from its ticket link."
-                    : "Live places and venue photos are not connected yet. Starter picks are available below.");
+                : deviceOnly
+                  ? eventMode
+                      ? "Add an event from its published source link. Live event search is off on this site."
+                      : "Browse starter references or add your own place. Live search is off on this site."
+                  : location.protocol === "file:" || !serverAvailable
+                    ? "Open this dashboard through the planning server to use live discovery."
+                    : eventMode
+                      ? "Live events need a connected city events feed. You can still add an event from its ticket link."
+                      : "Live search is off. Browse the starter references below, or add a place from its source link.");
         const start = document.querySelector('[data-action="live-search"]'),
             more = document.querySelector('[data-action="live-more"]');
         if (start) start.disabled = !enabled || city === "All" || Boolean(context?.pending);
@@ -410,7 +417,13 @@
             accountConfig = window.PlanmateAccount.config();
         $("accountBanner").innerHTML = account
             ? `Signed in as ${esc(account.name)} · Private profile syncs across devices. <button class="text-button" data-account-action="signout">Sign out</button>${groupCode && !state.members.find((m) => m.id === memberId)?.accountId ? '<button class="text-button" data-action="claim-membership">Bind this legacy membership to my account</button>' : ""}`
-            : `${groupCode ? "Guest access is saved on this device" : "Your profile stays on this device"} · <a href="login.html?${esc(navigationContext())}">${accountConfig.configured ? "Sign in for an account" : "Manage your sign-in"}</a>`;
+            : `${groupCode ? "Guest access is saved on this device" : "Your profile stays on this device"} · <a href="${accountConfig.configured ? "login.html" : "profile.html"}?${esc(navigationContext())}">${accountConfig.configured ? "Sign in for an account" : "Edit your profile"}</a>`;
+        if (deviceOnly) {
+            $("accountBanner").innerHTML =
+                `Personal plans are saved in this browser · Sharing and photo uploads need the full server version · <a href="profile.html?${esc(navigationContext())}">Edit your profile</a>`;
+            $("entryGuide").querySelector("p").textContent =
+                "Create a personal trip, explore places, schedule your days and track costs. Your plans and profile stay in this browser; shared invitations need the full server version.";
+        }
         $("tripTitle").innerHTML = `${esc(state.trip.title)}<span aria-hidden="true">✦</span>`;
         $("sidebarTitle").textContent = isWelcome() ? "Your trips" : state.trip.title;
         $("tripDates").textContent =
@@ -479,13 +492,25 @@
             `<div class="section-heading"><div><h2>${isSaved ? "Your little wishlist" : "Where shall we go?"}</h2><p>${isSaved ? "Places you’ve saved, ready when the group is." : "Find a place you love. Let the group take it from there."}</p></div><span class="hand-note">a good plan starts with an idea ↙</span></div>
             <div class="discover-tools"><label class="search-box">${icon("search")}<input id="placeSearch" type="search" value="${esc(search)}" placeholder="Search a place, area, or vibe…" aria-label="Search places"></label><label class="city-picker">${icon("pin")}<select id="browseCity" aria-label="Browse a city">${citiesOptions(city, isSaved)}</select></label></div>
             <div class="category-filters" aria-label="Place categories">${["All", ...C.categories].map((c) => `<button class="filter-chip ${c === category ? "active" : ""}" data-category="${c}" aria-pressed="${c === category}">${c !== "All" ? icon(categoryIcon[c]) : ""}${categoryLabel[c]}</button>`).join("")}</div>
+            <div id="regionFilters"></div>
             ${liveControls(isSaved)}
             <div id="placeResults"></div><div class="custom-callout"><div><strong>Got a spot in mind?</strong><p>Add any restaurant, club, hidden gem, or event.</p></div><button class="button secondary" data-action="custom">${icon("plus")}Add your own</button></div>`;
         renderResults(photos);
     }
     function renderResults(photos) {
+        const regional = city === catalogue.region.city;
+        const regionFilters = $("regionFilters");
+        if (regionFilters) {
+            const options = ["All", ...new Set(catalogue.region.places.map(p => p.cluster))];
+            regionFilters.innerHTML = regional ? '<div class="info-box"><strong>Explore the wider Chikkamagaluru region</strong><p>60 places and experiences across separate circuits. Some are long detours; check the area before adding them to a day.</p><div class="form-row">' +
+                field("Area / circuit", '<select id="regionCluster">' + options.map(c => '<option value="' + esc(c) + '"' + (c === regionCluster ? ' selected' : '') + '>' + esc(c === "All" ? "All circuits" : c) + '</option>').join("") + '</select>') +
+                field("Research status", '<select id="regionEvidence">' + [["All", "All options"], ["published_destination", "Published destinations"], ["research_lead", "Research leads · verify locally"]].map(([v, label]) => '<option value="' + v + '"' + (v === regionEvidence ? ' selected' : '') + '>' + label + '</option>').join("") + '</select>') +
+                '</div><p>Full ridge access and the bridge need confirmation. Book Bhadra through an authorized safari; this catalogue does not promise self-drive forest access or night entry.</p></div>' : "";
+        }
         const context = liveContext?.key === liveKey() ? liveContext : null;
         const places = allPlaces().filter((p) => {
+            if (regional && ((regionCluster !== "All" && p.cluster !== regionCluster) ||
+                (regionEvidence !== "All" && p.evidenceStatus !== regionEvidence))) return false;
             if (
                 (city !== "All" && p.city !== city) ||
                 (category !== "All" && p.category !== category) ||
@@ -493,7 +518,7 @@
             )
                 return false;
             if (
-                !`${p.name} ${p.area} ${p.city} ${p.category} ${p.eventType || ""}`
+                !`${p.name} ${p.area} ${p.city} ${p.category} ${p.eventType || ""} ${p.type || ""} ${p.sourceIds ? catalogue.region.aliases.join(" ") : ""}`
                     .toLowerCase()
                     .includes(search.toLowerCase()) &&
                 !context?.ids.has(p.id)
@@ -513,6 +538,7 @@
                 view !== "saved" &&
                 p.provider !== "google" &&
                 p.category !== "Event" &&
+                !p.sourceIds &&
                 [...liveRecords.values()].some(
                     (l) =>
                         l.provider === "google" &&
@@ -540,7 +566,7 @@
                     (idea) => idea.place.id === p.id && idea.status === "pending",
                 );
                 const bookmarked = saved.includes(p.id);
-                return `<article class="place-card"><div class="place-visual">${placeVisual(p)}<span class="place-category">${categoryLabel[p.category]}</span><button class="save-place ${bookmarked ? "saved" : ""}" data-action="save-place" data-id="${esc(p.id)}" aria-label="${bookmarked ? "Unsave" : "Save"} ${esc(p.name)}" aria-pressed="${bookmarked}">${icon("heart")}</button></div><div class="place-body"><button class="place-title" data-action="details" data-id="${esc(p.id)}">${esc(p.name)}</button><p class="place-location">${icon("pin")}${esc(p.area)}, ${esc(p.city)}</p>${p.eventDate ? `<p class="event-caption">${eventCaption(p)}</p>` : ""}${credits(p)}<div class="place-meta"><span>${icon("clock")}${(p.duration / 60) % 1 ? `${p.duration} min` : `${p.duration / 60} hr`} planning estimate</span><span>${p.provider ? "Live discovery" : p.custom ? "Group discovery" : "Starter pick"}</span></div><div class="place-footer"><button class="text-button" data-action="details" data-id="${esc(p.id)}">View details ${icon("arrow")}</button><button class="button ${proposal ? "soft" : "primary"}" data-action="${proposal ? "show-ideas" : "propose"}" data-id="${esc(p.id)}">${icon(proposal ? "check" : "plus")}${proposal ? "On ideas board" : "Propose to group"}</button></div></div></article>`;
+                return `<article class="place-card"><div class="place-visual">${placeVisual(p)}<span class="place-category">${categoryLabel[p.category]}</span><button class="save-place ${bookmarked ? "saved" : ""}" data-action="save-place" data-id="${esc(p.id)}" aria-label="${bookmarked ? "Unsave" : "Save"} ${esc(p.name)}" aria-pressed="${bookmarked}">${icon("heart")}</button></div><div class="place-body"><button class="place-title" data-action="details" data-id="${esc(p.id)}">${esc(p.name)}</button><p class="place-location">${icon("pin")}${esc(p.area)}, ${esc(p.city)}</p>${p.eventDate ? `<p class="event-caption">${eventCaption(p)}</p>` : ""}${credits(p)}${p.sourceIds ? `<p class="plan-notice">${esc(p.type)} · ${p.evidenceStatus === "research_lead" ? "Confirm location & access locally" : "Check access for your dates"}</p>` : ""}<div class="place-meta"><span>${icon("clock")}${p.durationKnown === false ? "Choose your duration" : (p.duration / 60) % 1 ? `${p.duration} min` : `${p.duration / 60} hr`} planning estimate</span><span>${p.provider ? "Live discovery" : p.custom ? "Group discovery" : p.evidenceStatus === "research_lead" ? "Research lead" : p.sourceIds ? "Regional pick" : "Starter pick"}</span></div><div class="place-footer"><button class="text-button" data-action="details" data-id="${esc(p.id)}">View details ${icon("arrow")}</button><button class="button ${proposal ? "soft" : "primary"}" data-action="${proposal ? "show-ideas" : "propose"}" data-id="${esc(p.id)}">${icon(proposal ? "check" : "plus")}${proposal ? "On ideas board" : "Propose to group"}</button></div></div></article>`;
             })
             .join("");
         const html =
@@ -800,13 +826,26 @@
             `<form data-form="custom">${field("Place or event name", '<input name="name" maxlength="100" required placeholder="e.g. A gig, a beach café, a hidden trail">')}<div class="form-row">${field("City", `<input name="city" value="${esc(city === "All" ? state.trip.city : city)}" list="cityNames" maxlength="60" required><datalist id="cityNames">${catalogue.cities.map((c) => `<option value="${esc(c)}">`).join("")}</datalist>`)}${field("Category", `<select name="category">${C.categories.map((c) => `<option value="${c}">${categoryLabel[c]}</option>`).join("")}</select>`)}</div>${field("Area or neighbourhood", '<input name="area" maxlength="100" placeholder="Where in the city?">')}${field("Venue, event or map link (optional)", '<input type="url" name="source" maxlength="1500" placeholder="https://…">')}${field("Preferred day / event date", `<select name="preferredDate">${dayOptions("", true)}</select>`, "For a dated event, choose its actual day. Edit the trip dates first if needed.")}${field("Tell your friends", '<textarea name="note" maxlength="500" placeholder="Timing, price estimate, or why you love this idea…"></textarea>')}${formError}${actions("Share your discovery")}</form>`,
         );
     }
+    function regionalDetails(p) {
+        if (!p.sourceIds) return "";
+        return '<div class="info-box"><strong>' +
+            (p.evidenceStatus === "research_lead" ? "Research lead · verify locally" : "Regional research") +
+            '</strong><p>' + esc(p.type + " · " + p.cluster) +
+            '</p><p>Researched ' + esc(p.lastResearched) +
+            '. Access, opening times, fees and availability for your dates remain unconfirmed. Durations are editable planning placeholders.</p>' +
+            p.sourceIds.map(id => {
+                const source = catalogue.region.sources[id];
+                return '<p><a target="_blank" rel="noopener noreferrer" href="' + esc(source.url) + '">' +
+                    esc(source.title) + ' ↗</a>' + (source.caveat ? '<br>' + esc(source.caveat) : '') + '</p>';
+            }).join("") + '</div>';
+    }
     function openDetails(id) {
         const p = findPlace(id);
         if (!p) return;
         openDialog(
             p.name,
             `${p.area}, ${p.city} · ${categoryLabel[p.category]}`,
-            `<div class="dialog-scene">${placeVisual(p)}</div>${credits(p)}${p.eventDate ? `<p class="event-caption">${eventCaption(p)}</p>` : ""}<p class="detail-description">${esc(p.description)}</p><div class="info-box"><strong>A starting point for your plan</strong><p>Allow around ${p.duration} minutes, or choose your own duration. Check current opening hours, entry rules, prices and availability before going.</p></div><div class="detail-links"><a href="${esc(mapsUrl(p))}" target="_blank" rel="noopener noreferrer">Find on Google Maps ↗</a>${p.source ? `<a href="${esc(C.safeUrl(p.source))}" target="_blank" rel="noopener noreferrer">${p.category === "Event" ? "Event / ticket listing" : p.provider === "google" ? "Google Maps listing" : "Venue / tourism guide"} ↗</a>` : ""}</div><div class="dialog-actions"><button class="button secondary" data-action="save-place" data-id="${esc(p.id)}">${saved.includes(p.id) ? "Saved ♥" : "Save for later ♡"}</button><button class="button primary" data-action="propose" data-id="${esc(p.id)}">Propose to group</button></div>`,
+            `<div class="dialog-scene">${placeVisual(p)}</div>${credits(p)}${p.eventDate ? `<p class="event-caption">${eventCaption(p)}</p>` : ""}<p class="detail-description">${esc(p.description)}</p>${regionalDetails(p)}<div class="info-box"><strong>A starting point for your plan</strong><p>Allow around ${p.duration} minutes, or choose your own duration. Check current opening hours, entry rules, prices and availability before going.</p></div><div class="detail-links"><a href="${esc(mapsUrl(p))}" target="_blank" rel="noopener noreferrer">Find on Google Maps ↗</a>${p.source ? `<a href="${esc(C.safeUrl(p.source))}" target="_blank" rel="noopener noreferrer">${p.category === "Event" ? "Event / ticket listing" : p.provider === "google" ? "Google Maps listing" : "Venue / tourism guide"} ↗</a>` : ""}</div><div class="dialog-actions"><button class="button secondary" data-action="save-place" data-id="${esc(p.id)}">${saved.includes(p.id) ? "Saved ♥" : "Save for later ♡"}</button><button class="button primary" data-action="propose" data-id="${esc(p.id)}">Propose to group</button></div>`,
         );
     }
     function timeString(m) {
@@ -853,16 +892,32 @@
             editing ? "Make it your kind of trip" : "A new adventure starts here",
             editing
                 ? "Change the dates, destination or budget together."
-                : "Give your next plan a name and invite your people.",
+                : deviceOnly
+                  ? "Give your personal plan a name, dates and budget."
+                  : "Give your next plan a name and invite your people.",
             `<form data-form="${editing ? "edit-trip" : "new-trip"}">${field("Trip name", `<input name="title" value="${esc(t.title)}" maxlength="100" required>`)}${field("Main destination", `<input name="city" value="${esc(t.city)}" maxlength="60" list="tripCities" required><datalist id="tripCities">${catalogue.cities.map((c) => `<option value="${esc(c)}">`).join("")}</datalist>`)}<div class="form-row">${field("First day", `<input type="date" name="start" value="${t.start}" required>`)}${field("Last day", `<input type="date" name="end" value="${t.end}" required>`)}</div>${field("Whole-trip budget per person (₹)", `<input type="number" name="budget" min="0" max="1000000" step="1" value="${t.budget}" required>`)}${!editing ? `${field("Your name", `<input name="name" value="${esc(profileName === "You" ? "" : profileName)}" placeholder="Your name" maxlength="60" required>`)}<label class="checkbox-field"><input name="shared" type="checkbox" ${serverAvailable ? "checked" : "disabled"}>Shared plan · Friends can join on their own devices</label>${!serverAvailable ? '<div class="info-box">Shared planning is temporarily unavailable. You can save a plan on this device and try again later.</div>' : ""}` : ""}${formError}${actions(editing ? "Save trip details" : "Create planning space")}</form>`,
         );
+        if (deviceOnly && !editing) {
+            const note = $("appDialog").querySelector(".info-box");
+            if (note)
+                note.textContent =
+                    "This trip is saved only in this browser. Friends cannot join it on another device. You can share an exported itinerary PDF.";
+        }
     }
     function inviteUrl() {
         const params = new URLSearchParams({ group: groupCode });
         if (sessions[groupCode]?.invite) params.set("invite", sessions[groupCode].invite);
         return `${location.origin}${location.pathname}?${params}`;
     }
+    function openSharingInfo() {
+        openDialog(
+            "Plans on this device",
+            "Your plans stay in this browser.",
+            '<div class="info-box"><p>Shared invitations and photo uploads are unavailable on this site. You can export your itinerary as a PDF to send to friends; later edits will not sync between devices.</p></div><div class="dialog-actions"><button class="button secondary" data-action="close-dialog">Got it</button></div>',
+        );
+    }
     function openInvite() {
+        if (deviceOnly) return openSharingInfo();
         if (isWelcome()) return openTrip();
         if (!groupCode)
             return openDialog(
@@ -969,6 +1024,7 @@
         }
     }
     function openJoin(code) {
+        if (deviceOnly) return openSharingInfo();
         openDialog(
             "Your friends saved you a spot",
             "Join their trip and bring your own ideas.",
@@ -1164,6 +1220,8 @@
         }
     });
     document.addEventListener("change", (event) => {
+        if (event.target.id === "regionCluster") { regionCluster = event.target.value; visibleCount = 6; renderResults(); }
+        if (event.target.id === "regionEvidence") { regionEvidence = event.target.value; visibleCount = 6; renderResults(); }
         if (event.target.id === "browseCity") {
             city = event.target.value;
             visibleCount = 6;
@@ -1481,18 +1539,24 @@
                   ? "Ready when you are"
                   : "Saved on this device",
         );
-        if (location.protocol === "file:") {
+        if (location.protocol === "file:" || deviceOnly) {
             if (openingShared) {
-                sharedOpenMessage =
-                    "Open this invitation from the Planmate website to join the shared trip.";
+                sharedOpenMessage = deviceOnly
+                    ? "This site saves personal plans in your browser. Shared invitations cannot be opened here."
+                    : "Open this invitation from the Planmate website to join the shared trip.";
                 render();
-                setStatus("Shared plan needs the server");
+                setStatus(
+                    deviceOnly
+                        ? "Shared invitations are unavailable on this site"
+                        : "Shared plan needs the server",
+                );
             }
             if (requestedPlanCity) openTrip(false, requestedPlanCity);
             return;
         }
         try {
-            await request("/api/health");
+            const health = await request("/api/health");
+            routesAvailable = Boolean(health.map?.routes);
             serverAvailable = true;
         } catch {
             serverAvailable = false;
@@ -1573,6 +1637,7 @@
         state: () => state,
         memberId: () => memberId,
         groupCode: () => groupCode,
+        routesAvailable: () => routesAvailable,
         memberName,
         mutate,
         toast,

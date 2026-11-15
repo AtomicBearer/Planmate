@@ -99,11 +99,15 @@
             return panel(
                 "The things we'll remember",
                 notice(
-                    "A shared scrapbook of your own photos and captions. Venue-provider photos are never copied here.",
+                    window.PlanmateSite?.deviceOnly
+                        ? "Keep your visited stops and notes together. Photo uploads are unavailable on this site."
+                        : "A shared scrapbook of your own photos and captions. Venue-provider photos are never copied here.",
                 ) +
                     (!a.groupCode()
                         ? notice(
-                              "Create a shared trip to add photos with your friends. Your visited stops and notes remain saved on this device.",
+                              window.PlanmateSite?.deviceOnly
+                                  ? "Your visited stops and notes remain saved in this browser."
+                                  : "Create a shared trip to add photos with your friends. Your visited stops and notes remain saved on this device.",
                           )
                         : notice(
                               "JPEG or PNG · up to 5 MB each · up to 100 photos per trip. Visible only with trip membership; authors control their photos and captions.",

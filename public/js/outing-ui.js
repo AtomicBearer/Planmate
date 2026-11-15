@@ -127,7 +127,15 @@
             const list = C.orderedStops(s()).filter((p) => p.date === stop.date),
                 index = list.findIndex((p) => p.id === stop.id),
                 v = s().visits[stop.id];
-            return `<div class="plan-row stop-tools">${button("locate", "Locate on map", stop.id)}${button("move-up", "Move up", stop.id, index === 0 ? "disabled" : "")}${button("move-down", "Move down", stop.id, index === list.length - 1 ? "disabled" : "")}<button class="button secondary small drag-handle" type="button" draggable="true" data-drag-id="${esc(stop.id)}" aria-label="Drag ${esc(a.displayPlace(stop.place).name)} to reorder. Move up and down controls are also available.">↕ Drag</button>${button("visit", v ? "Visited ✓ · undo" : "Mark group visited", stop.id)}${stop.place.provider !== "google" ? button("coordinates", "Set sourced location", stop.id) : ""}</div>${notice(`${O.fixed(stop) ? "Pinned / fixed time · " : ""}${v ? "Group visited by " + a.memberName(v.by) + " · " : ""}${stop.costKnown ? "Cost is a group estimate" : "Cost unknown — displayed total is incomplete"} · ${stop.travelKnown ? "Travel buffer is a manual estimate" : "Travel unknown — zero minutes reserved; review before confirming"}`)}${index > 0 ? button("route", "Check connected route", stop.id) : ""}<p class="plan-notice" data-route-result="${esc(stop.id)}">${esc(routeResults[stop.id] || "")}</p>`;
+            const routeControl =
+                index > 0
+                    ? a.routesAvailable?.()
+                        ? button("route", "Check connected route", stop.id)
+                        : notice(
+                              "Route checking is off. Enter and review a manual travel buffer between stops.",
+                          )
+                    : "";
+            return `<div class="plan-row stop-tools">${button("locate", "Locate on map", stop.id)}${button("move-up", "Move up", stop.id, index === 0 ? "disabled" : "")}${button("move-down", "Move down", stop.id, index === list.length - 1 ? "disabled" : "")}<button class="button secondary small drag-handle" type="button" draggable="true" data-drag-id="${esc(stop.id)}" aria-label="Drag ${esc(a.displayPlace(stop.place).name)} to reorder. Move up and down controls are also available.">↕ Drag</button>${button("visit", v ? "Visited ✓ · undo" : "Mark group visited", stop.id)}${stop.place.provider !== "google" ? button("coordinates", "Set sourced location", stop.id) : ""}</div>${notice(`${O.fixed(stop) ? "Pinned / fixed time · " : ""}${v ? "Group visited by " + a.memberName(v.by) + " · " : ""}${stop.costKnown ? "Cost is a group estimate" : "Cost unknown — displayed total is incomplete"} · ${stop.travelKnown ? "Travel buffer is a manual estimate" : "Travel unknown — zero minutes reserved; review before confirming"}`)}${routeControl}<p class="plan-notice" data-route-result="${esc(stop.id)}">${esc(routeResults[stop.id] || "")}</p>`;
         }
         function today() {
             const info = O.today(s(), new Date(), todayDay || undefined),

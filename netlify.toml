@@ -1,0 +1,12 @@
+# Git/CLI deployment with private shared storage. Folder-only uploads stay personal.
+[build]
+command = "pnpm run build:netlify:shared"
+publish = "output/netlify"
+
+[build.environment]
+NODE_VERSION = "24.19.0"
+
+[functions]
+directory = "netlify/functions"
+node_bundler = "esbuild"
+external_node_modules = ["sharp"]

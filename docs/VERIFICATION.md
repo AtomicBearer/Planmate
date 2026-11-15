@@ -1,6 +1,26 @@
-# Product review and verification — 8 October 2026
+# Product review and verification — 9 October 2026
 
 Planmate keeps its vanilla architecture, planning features and travel scrapbook theme. This report records the current product polish, existing feature checks and remaining provider/deployment work. Live provider validation remains incomplete because credentials are unconfigured.
+
+## Release without external API keys
+
+### Netlify folder upload
+
+The prepared `output/planmate-netlify.zip` contains 61 public files, including the root entry page, browser modules, local fonts/PDF assets, Netlify headers/redirects and required asset license notices. Credentials, server code, dependencies and saved plans are excluded. Fresh visitors start with an empty dashboard. The upload uses personal browser storage; shared invitations, independent member responses, verified accounts and private server photo uploads require a backend and are unavailable in this upload mode. The full Node application remains intact. See [NETLIFY-UPLOAD.md](NETLIFY-UPLOAD.md).
+
+Current checks pass: **47 linked public files**, JavaScript syntax/dependency order and formatting; **118 Node tests**; and **10 Chrome browser journeys**, including the actual generated static folder served without a backend. The Netlify journey verifies empty startup, device-profile entry, trip creation/reload, sharing-limit feedback, PDF download, separate profile navigation, a fresh independent browser and a 320px layout. It detects no unexpected API/external requests, missing assets or browser errors. Packaging tests verify the exact public/license file set, stale-file removal and safe output boundaries. The full server journey still verifies shared planning, expenses and private scrapbook uploads. The generated ZIP was inspected for the root entry and private-file exclusion, and the static mobile layout was visually inspected.
+
+No Netlify upload or public deployment has been performed. Live Netlify headers, HTTPS and the final site URL must be checked after uploading. The results below record the earlier Node-hosted release work.
+
+The guest release starts empty: no pre-made trip, members, suggestions or itinerary are inserted. The welcome artwork now describes starting your own plan instead of showing a fictional group's responses. Starter venue references remain available for discovery. Existing saved plans are preserved.
+
+Local theme fonts replace Google Fonts requests on all pages, with original assets, licenses and hashes in `public/assets/fonts/` and `licenses/web-fonts/`. Google sign-in is hidden when unconfigured; its SDK loads only after configured sign-in is reported. Device-profile scope remains explicit. Connected route controls are only offered when the server reports a route provider; otherwise members use labelled manual travel estimates. Fragmented UTF-8 request decoding preserves Indian-language names.
+
+`render.yaml` prepares a single Node web service with a **paid** persistent disk, pinned runtime, health check, startup preflight and GitHub check gating. `server/deployment-config.js` consistently resolves an explicit custom origin or Render's assigned URL. The server drains requests and closes storage on ordinary termination. The organized folder structure and static allowlist remain intact; hosting configurations, private data and licenses are not exposed as browser files.
+
+Verification for these changes: 46 linked browser files pass project/order/syntax and formatting checks; all 115 Node tests pass, including fresh empty storage, provider-free guest persistence across restart, origin restrictions, fragmented UTF-8 names and shutdown cleanup. All nine Chrome browser journeys pass; the product journey additionally checks no automatic external requests, local font rendering, empty entry, saved-plan compatibility, conditional SDK loading and sign-in failure feedback. Desktop and 320px screenshots were visually inspected. The full planning browser case verifies expenses and private photo upload/edit/reload/delete; server cases verify media persistence and authorization. Tests use disposable data and fixture providers.
+
+The local `.env` has blank external-provider settings and guest mode. It remains private and ignored. No repository was pushed and no hosting service, paid resource, DNS record or live integration was created. The Render configuration is prepared from current provider documentation and checked locally; actual provisioning, GitHub-hosted CI, public HTTPS/proxy behavior and persistent disk must be verified on the deployed service. Follow [DEPLOYMENT.md](DEPLOYMENT.md) for the steps and [API-CONNECTIONS.md](API-CONNECTIONS.md) only when choosing optional future integrations.
 
 ## Product polish and organization
 
