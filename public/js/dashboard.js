@@ -106,7 +106,9 @@
         ],
     };
     const liveRecords = new Map();
-    let regionCluster = "All", regionEvidence = "All";
+    let regionCluster = "All",
+        regionEvidence = "All",
+        photoLimitBytes = 5 * 1024 * 1024;
     let liveContext = null,
         eventFrom = "",
         eventTo = "",
@@ -501,16 +503,58 @@
         const regional = city === catalogue.region.city;
         const regionFilters = $("regionFilters");
         if (regionFilters) {
-            const options = ["All", ...new Set(catalogue.region.places.map(p => p.cluster))];
-            regionFilters.innerHTML = regional ? '<div class="info-box"><strong>Explore the wider Chikkamagaluru region</strong><p>60 places and experiences across separate circuits. Some are long detours; check the area before adding them to a day.</p><div class="form-row">' +
-                field("Area / circuit", '<select id="regionCluster">' + options.map(c => '<option value="' + esc(c) + '"' + (c === regionCluster ? ' selected' : '') + '>' + esc(c === "All" ? "All circuits" : c) + '</option>').join("") + '</select>') +
-                field("Research status", '<select id="regionEvidence">' + [["All", "All options"], ["published_destination", "Published destinations"], ["research_lead", "Research leads · verify locally"]].map(([v, label]) => '<option value="' + v + '"' + (v === regionEvidence ? ' selected' : '') + '>' + label + '</option>').join("") + '</select>') +
-                '</div><p>Full ridge access and the bridge need confirmation. Book Bhadra through an authorized safari; this catalogue does not promise self-drive forest access or night entry.</p></div>' : "";
+            const options = ["All", ...new Set(catalogue.region.places.map((p) => p.cluster))];
+            regionFilters.innerHTML = regional
+                ? '<div class="info-box"><strong>Explore the wider Chikkamagaluru region</strong><p>60 places and experiences across separate circuits. Some are long detours; check the area before adding them to a day.</p><div class="form-row">' +
+                  field(
+                      "Area / circuit",
+                      '<select id="regionCluster">' +
+                          options
+                              .map(
+                                  (c) =>
+                                      '<option value="' +
+                                      esc(c) +
+                                      '"' +
+                                      (c === regionCluster ? " selected" : "") +
+                                      ">" +
+                                      esc(c === "All" ? "All circuits" : c) +
+                                      "</option>",
+                              )
+                              .join("") +
+                          "</select>",
+                  ) +
+                  field(
+                      "Research status",
+                      '<select id="regionEvidence">' +
+                          [
+                              ["All", "All options"],
+                              ["published_destination", "Published destinations"],
+                              ["research_lead", "Research leads · verify locally"],
+                          ]
+                              .map(
+                                  ([v, label]) =>
+                                      '<option value="' +
+                                      v +
+                                      '"' +
+                                      (v === regionEvidence ? " selected" : "") +
+                                      ">" +
+                                      label +
+                                      "</option>",
+                              )
+                              .join("") +
+                          "</select>",
+                  ) +
+                  "</div><p>Full ridge access and the bridge need confirmation. Book Bhadra through an authorized safari; this catalogue does not promise self-drive forest access or night entry.</p></div>"
+                : "";
         }
         const context = liveContext?.key === liveKey() ? liveContext : null;
         const places = allPlaces().filter((p) => {
-            if (regional && ((regionCluster !== "All" && p.cluster !== regionCluster) ||
-                (regionEvidence !== "All" && p.evidenceStatus !== regionEvidence))) return false;
+            if (
+                regional &&
+                ((regionCluster !== "All" && p.cluster !== regionCluster) ||
+                    (regionEvidence !== "All" && p.evidenceStatus !== regionEvidence))
+            )
+                return false;
             if (
                 (city !== "All" && p.city !== city) ||
                 (category !== "All" && p.category !== category) ||
@@ -518,7 +562,7 @@
             )
                 return false;
             if (
-                !`${p.name} ${p.area} ${p.city} ${p.category} ${p.eventType || ""} ${p.type || ""} ${p.sourceIds ? catalogue.region.aliases.join(" ") : ""}`
+                !`${p.name} ${p.area} ${p.city} ${p.category} ${p.eventType || ""} ${p.type || ""} ${p.planningNote || ""} ${p.sourceIds ? catalogue.region.aliases.join(" ") : ""}`
                     .toLowerCase()
                     .includes(search.toLowerCase()) &&
                 !context?.ids.has(p.id)
@@ -566,7 +610,7 @@
                     (idea) => idea.place.id === p.id && idea.status === "pending",
                 );
                 const bookmarked = saved.includes(p.id);
-                return `<article class="place-card"><div class="place-visual">${placeVisual(p)}<span class="place-category">${categoryLabel[p.category]}</span><button class="save-place ${bookmarked ? "saved" : ""}" data-action="save-place" data-id="${esc(p.id)}" aria-label="${bookmarked ? "Unsave" : "Save"} ${esc(p.name)}" aria-pressed="${bookmarked}">${icon("heart")}</button></div><div class="place-body"><button class="place-title" data-action="details" data-id="${esc(p.id)}">${esc(p.name)}</button><p class="place-location">${icon("pin")}${esc(p.area)}, ${esc(p.city)}</p>${p.eventDate ? `<p class="event-caption">${eventCaption(p)}</p>` : ""}${credits(p)}${p.sourceIds ? `<p class="plan-notice">${esc(p.type)} · ${p.evidenceStatus === "research_lead" ? "Confirm location & access locally" : "Check access for your dates"}</p>` : ""}<div class="place-meta"><span>${icon("clock")}${p.durationKnown === false ? "Choose your duration" : (p.duration / 60) % 1 ? `${p.duration} min` : `${p.duration / 60} hr`} planning estimate</span><span>${p.provider ? "Live discovery" : p.custom ? "Group discovery" : p.evidenceStatus === "research_lead" ? "Research lead" : p.sourceIds ? "Regional pick" : "Starter pick"}</span></div><div class="place-footer"><button class="text-button" data-action="details" data-id="${esc(p.id)}">View details ${icon("arrow")}</button><button class="button ${proposal ? "soft" : "primary"}" data-action="${proposal ? "show-ideas" : "propose"}" data-id="${esc(p.id)}">${icon(proposal ? "check" : "plus")}${proposal ? "On ideas board" : "Propose to group"}</button></div></div></article>`;
+                return `<article class="place-card"><div class="place-visual">${placeVisual(p)}<span class="place-category">${categoryLabel[p.category]}</span><button class="save-place ${bookmarked ? "saved" : ""}" data-action="save-place" data-id="${esc(p.id)}" aria-label="${bookmarked ? "Unsave" : "Save"} ${esc(p.name)}" aria-pressed="${bookmarked}">${icon("heart")}</button></div><div class="place-body"><button class="place-title" data-action="details" data-id="${esc(p.id)}">${esc(p.name)}</button><p class="place-location">${icon("pin")}${esc(p.area)}, ${esc(p.city)}</p>${p.eventDate ? `<p class="event-caption">${eventCaption(p)}</p>` : ""}${credits(p)}${p.sourceIds ? `<p class="plan-notice">${esc(p.type)} · ${p.evidenceStatus === "research_lead" ? "Confirm location & access locally" : "Check access for your dates"}</p>` : ""}<div class="place-meta"><span>${icon("clock")}${p.durationKnown === false ? "Duration to be planned" : `${(p.duration / 60) % 1 ? `${p.duration} min` : `${p.duration / 60} hr`} planning estimate`}</span><span>${p.provider ? "Live discovery" : p.custom ? "Group discovery" : p.evidenceStatus === "research_lead" ? "Research lead" : p.sourceIds ? "Regional pick" : "Starter pick"}</span></div><div class="place-footer"><button class="text-button" data-action="details" data-id="${esc(p.id)}">View details ${icon("arrow")}</button><button class="button ${proposal ? "soft" : "primary"}" data-action="${proposal ? "show-ideas" : "propose"}" data-id="${esc(p.id)}">${icon(proposal ? "check" : "plus")}${proposal ? "On ideas board" : "Propose to group"}</button></div></div></article>`;
             })
             .join("");
         const html =
@@ -828,16 +872,32 @@
     }
     function regionalDetails(p) {
         if (!p.sourceIds) return "";
-        return '<div class="info-box"><strong>' +
-            (p.evidenceStatus === "research_lead" ? "Research lead · verify locally" : "Regional research") +
-            '</strong><p>' + esc(p.type + " · " + p.cluster) +
-            '</p><p>Researched ' + esc(p.lastResearched) +
-            '. Access, opening times, fees and availability for your dates remain unconfirmed. Durations are editable planning placeholders.</p>' +
-            p.sourceIds.map(id => {
-                const source = catalogue.region.sources[id];
-                return '<p><a target="_blank" rel="noopener noreferrer" href="' + esc(source.url) + '">' +
-                    esc(source.title) + ' ↗</a>' + (source.caveat ? '<br>' + esc(source.caveat) : '') + '</p>';
-            }).join("") + '</div>';
+        return (
+            '<div class="info-box"><strong>' +
+            (p.evidenceStatus === "research_lead"
+                ? "Research lead · verify locally"
+                : "Regional research") +
+            "</strong><p>" +
+            esc(p.type + " · " + p.cluster) +
+            "</p><p>Researched " +
+            esc(p.lastResearched) +
+            ". Access, opening times, fees and availability for your dates remain unconfirmed. Durations are editable planning placeholders.</p>" +
+            p.sourceIds
+                .map((id) => {
+                    const source = catalogue.region.sources[id];
+                    return (
+                        '<p><a target="_blank" rel="noopener noreferrer" href="' +
+                        esc(source.url) +
+                        '">' +
+                        esc(source.title) +
+                        " ↗</a>" +
+                        (source.caveat ? "<br>" + esc(source.caveat) : "") +
+                        "</p>"
+                    );
+                })
+                .join("") +
+            "</div>"
+        );
     }
     function openDetails(id) {
         const p = findPlace(id);
@@ -845,7 +905,7 @@
         openDialog(
             p.name,
             `${p.area}, ${p.city} · ${categoryLabel[p.category]}`,
-            `<div class="dialog-scene">${placeVisual(p)}</div>${credits(p)}${p.eventDate ? `<p class="event-caption">${eventCaption(p)}</p>` : ""}<p class="detail-description">${esc(p.description)}</p>${regionalDetails(p)}<div class="info-box"><strong>A starting point for your plan</strong><p>Allow around ${p.duration} minutes, or choose your own duration. Check current opening hours, entry rules, prices and availability before going.</p></div><div class="detail-links"><a href="${esc(mapsUrl(p))}" target="_blank" rel="noopener noreferrer">Find on Google Maps ↗</a>${p.source ? `<a href="${esc(C.safeUrl(p.source))}" target="_blank" rel="noopener noreferrer">${p.category === "Event" ? "Event / ticket listing" : p.provider === "google" ? "Google Maps listing" : "Venue / tourism guide"} ↗</a>` : ""}</div><div class="dialog-actions"><button class="button secondary" data-action="save-place" data-id="${esc(p.id)}">${saved.includes(p.id) ? "Saved ♥" : "Save for later ♡"}</button><button class="button primary" data-action="propose" data-id="${esc(p.id)}">Propose to group</button></div>`,
+            `<div class="dialog-scene">${placeVisual(p)}</div>${credits(p)}${p.eventDate ? `<p class="event-caption">${eventCaption(p)}</p>` : ""}<p class="detail-description">${esc(p.description)}</p>${regionalDetails(p)}<div class="info-box"><strong>A starting point for your plan</strong><p>${p.durationKnown === false ? "Set a duration after checking the route or visit with a local guide or operator." : `Allow around ${p.duration} minutes, or choose your own duration.`} Check current opening hours, entry rules, prices and availability before going.</p></div><div class="detail-links"><a href="${esc(mapsUrl(p))}" target="_blank" rel="noopener noreferrer">Find on Google Maps ↗</a>${p.source ? `<a href="${esc(C.safeUrl(p.source))}" target="_blank" rel="noopener noreferrer">${p.category === "Event" ? "Event / ticket listing" : p.provider === "google" ? "Google Maps listing" : "Venue / tourism guide"} ↗</a>` : ""}</div><div class="dialog-actions"><button class="button secondary" data-action="save-place" data-id="${esc(p.id)}">${saved.includes(p.id) ? "Saved ♥" : "Save for later ♡"}</button><button class="button primary" data-action="propose" data-id="${esc(p.id)}">Propose to group</button></div>`,
         );
     }
     function timeString(m) {
@@ -1220,8 +1280,16 @@
         }
     });
     document.addEventListener("change", (event) => {
-        if (event.target.id === "regionCluster") { regionCluster = event.target.value; visibleCount = 6; renderResults(); }
-        if (event.target.id === "regionEvidence") { regionEvidence = event.target.value; visibleCount = 6; renderResults(); }
+        if (event.target.id === "regionCluster") {
+            regionCluster = event.target.value;
+            visibleCount = 6;
+            renderResults();
+        }
+        if (event.target.id === "regionEvidence") {
+            regionEvidence = event.target.value;
+            visibleCount = 6;
+            renderResults();
+        }
         if (event.target.id === "browseCity") {
             city = event.target.value;
             visibleCount = 6;
@@ -1556,6 +1624,8 @@
         }
         try {
             const health = await request("/api/health");
+            if (Number.isInteger(health.photoLimitBytes) && health.photoLimitBytes > 0)
+                photoLimitBytes = Math.min(photoLimitBytes, health.photoLimitBytes);
             routesAvailable = Boolean(health.map?.routes);
             serverAvailable = true;
         } catch {
@@ -1611,6 +1681,17 @@
                 caption: ["scrapbook", "edit-caption"],
                 upload: ["scrapbook", "upload"],
             };
+            if (d.kind === "journey") {
+                setView("itinerary");
+                [...document.querySelectorAll("[data-train-action]")]
+                    .find(
+                        (b) =>
+                            b.dataset.trainAction === (d.id ? "edit" : "add") &&
+                            (!d.id || b.dataset.id === d.id),
+                    )
+                    ?.click();
+                return;
+            }
             if (d.kind === "preferences") return setView("fit");
             if (["availability", "add-date"].includes(d.kind)) return setView("group");
             if (d.kind === "comment") {
@@ -1638,6 +1719,7 @@
         memberId: () => memberId,
         groupCode: () => groupCode,
         routesAvailable: () => routesAvailable,
+        photoLimitBytes: () => photoLimitBytes,
         memberName,
         mutate,
         toast,

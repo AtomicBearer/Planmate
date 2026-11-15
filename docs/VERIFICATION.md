@@ -1,4 +1,19 @@
-# Product review and verification — 9 October 2026
+# Product review and verification
+
+## Chikkamagaluru and shared Netlify update — 15 November 2026
+
+- 60 regional discovery options with source/access notes, research-lead labels, circuit/status filters and city spelling aliases. No user trip, schedule or friends are prefilled.
+- Manual trains support overnight dates outside the local stay, unknown times, author/organizer edits, activity conflicts, private form recovery, shared persistence, Today and PDF export.
+- Netlify Functions/Blobs adapter preserves independent guest memberships, seven-day/revocable invitations, removed-member authorization, atomic concurrent writes, private re-encoded photos and provider references across function instances. Account-backed trips remain a Node-host feature.
+- Project checks pass for **50 linked public assets**, script order, syntax and formatting. The full automated test and browser runs are saved in ignored `test-results/verification-latest.log`; targeted Netlify photo checks are recorded separately.
+- **11 browser journeys passed in installed Microsoft Edge**, including the shared Netlify build with three independent browser contexts, source details, group proposals, overnight train persistence, PDF download, and 390/320px widths. The Netlify test uses a disposable storage adapter; no real user trips are modified.
+- **Netlify CLI 27.19.0 offline production build passed**, including bundling `planmate.mjs` and `cleanup-references.mjs`. The real functions, deploy context and Blobs permissions must still be smoke-tested after publishing.
+- The live URL returned HTTP 200 with the device-only marker, while `/api/health` returned HTTP 404. Netlify CLI status reported **not signed in**. No deployment was performed and no friends were messaged.
+- Phone/desktop screenshots and the train PDF page were visually inspected. A missing arrow glyph in the PDF heading was replaced with “to”; multiline train notes now paginate.
+
+Remaining publication instructions: [NETLIFY-SHARED.md](NETLIFY-SHARED.md). Real provider keys, January access/permits, train timetables and bookings were not verified by these automated tests.
+
+## Earlier product review — 9 October 2026
 
 Planmate keeps its vanilla architecture, planning features and travel scrapbook theme. This report records the current product polish, existing feature checks and remaining provider/deployment work. Live provider validation remains incomplete because credentials are unconfigured.
 

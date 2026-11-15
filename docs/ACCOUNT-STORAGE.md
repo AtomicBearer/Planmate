@@ -1,5 +1,7 @@
 # Accounts, migrations and recovery
 
+This document describes the Node/SQLite host. The separate Netlify adapter uses guest memberships and private Blobs storage; see [NETLIFY-SHARED.md](NETLIFY-SHARED.md). Verified account recovery and the SQLite backup commands below do not apply to that adapter.
+
 Use Node.js 24.13 or newer and `pnpm install --frozen-lockfile`. Runtime dependencies are Google's `google-auth-library` and Sharp; the application remains vanilla HTML/JavaScript with the existing Node server.
 
 ## Verified sign-in

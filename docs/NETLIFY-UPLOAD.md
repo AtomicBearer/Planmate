@@ -1,5 +1,7 @@
 # Upload Planmate to Netlify
 
+**For shared trips and friend invitations, use [NETLIFY-SHARED.md](NETLIFY-SHARED.md).** This document covers the separate personal-only folder-upload option.
+
 Use the prepared **`output/planmate-netlify.zip`**, or the **`output/netlify`** folder. The folder contains `index.html`, the other pages, styles, browser scripts, shared rules, fonts, PDF assets and their required license notices. It contains no `.env`, saved trips, member data, server source or dependencies.
 
 ## Upload in your browser
@@ -20,7 +22,7 @@ The original theme and pages remain. Create personal trips, browse reference pla
 
 **Shared invitations, independently submitted group responses/comments, verified accounts and private photo uploads cannot work through a browser folder upload alone.** Netlify Drop publishes static files; it does not deploy this project's Node server. The interface explains the limits and avoids failed backend requests. Visited stops and notes remain usable in the scrapbook without uploaded photos. Live venue searches/photos, connected routes/maps and event feeds stay off.
 
-The full server, shared planning and upload code are preserved in the source project. Publishing all collaborative features on Netlify later requires Netlify Functions plus durable database/media storage, deployed via Git or the CLI. Uploading the existing SQLite database or server scripts as public files would not provide that backend.
+The source now includes a Netlify Functions/Blobs adapter for guest collaboration, deployed via Git or the CLI. A folder upload cannot install those functions. Uploading the SQLite database or server scripts as public files would expose private data instead of providing a backend.
 
 ## Rebuild the upload after edits
 
@@ -39,4 +41,4 @@ On Windows, recreate the convenience ZIP with:
 Compress-Archive -Path '.\output\netlify\*' -DestinationPath '.\output\planmate-netlify.zip' -Force
 ```
 
-Keep the source, licenses and development documents separately. `netlify.toml` can also build these same personal-planning files if you later connect the repository; it does not deploy the complete shared backend.
+Keep the source, licenses and development documents separately. `netlify.toml` now selects the **shared** Git/CLI build. The explicit `pnpm run build:netlify` command above still creates the personal-only folder for Drop.

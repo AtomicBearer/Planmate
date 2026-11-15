@@ -1,6 +1,7 @@
 /* Starter discovery catalogue. No invented prices, ratings, opening hours or live events. */
 (function (root, factory) {
-    if (typeof module === "object" && module.exports) module.exports = factory(require("./chikkamagaluru.js"));
+    if (typeof module === "object" && module.exports)
+        module.exports = factory(require("./chikkamagaluru.js"));
     else root.PlannerCatalogue = factory(root.Chikkamagaluru);
 })(typeof globalThis !== "undefined" ? globalThis : this, function (Region) {
     const guide = "https://www.incredibleindia.gov.in/en/attractions";
@@ -208,5 +209,9 @@
             custom: false,
         })),
     );
-    return { cities: [...Object.keys(destinations), Region.city], places: [...places, ...Region.places], region: Region };
+    return {
+        cities: [...Object.keys(destinations), Region.city],
+        places: [...places, ...Region.places],
+        region: Region,
+    };
 });

@@ -1,7 +1,11 @@
 /* Shared planning rules, used by both the browser and the local server. */
 (function (root, factory) {
     if (typeof module === "object" && module.exports)
-        module.exports = factory(require("./planning-rules.js"), require("./train-rules.js"), require("./chikkamagaluru.js"));
+        module.exports = factory(
+            require("./planning-rules.js"),
+            require("./train-rules.js"),
+            require("./chikkamagaluru.js"),
+        );
     else root.PlannerCore = factory(root.PlanningRules, root.TrainRules, root.Chikkamagaluru);
 })(typeof globalThis !== "undefined" ? globalThis : this, function (Rules, Trains, Region) {
     "use strict";
@@ -347,7 +351,11 @@
                 break;
             }
             default:
-                check(Trains.execute(state, command, memberId, api) || Rules.execute(state, command, memberId, api), "Unknown planning action.");
+                check(
+                    Trains.execute(state, command, memberId, api) ||
+                        Rules.execute(state, command, memberId, api),
+                    "Unknown planning action.",
+                );
         }
         Trains.validateSchedule(state, api);
         Rules.finish(state, before);
@@ -393,7 +401,11 @@
         return value;
     }
     function canonicalCity(city) {
-        return [Region.city, ...Region.aliases].some((alias) => alias.toLowerCase() === city.trim().toLowerCase()) ? Region.city : city;
+        return [Region.city, ...Region.aliases].some(
+            (alias) => alias.toLowerCase() === city.trim().toLowerCase(),
+        )
+            ? Region.city
+            : city;
     }
     const api = {
         canonicalCity,

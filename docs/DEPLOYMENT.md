@@ -1,6 +1,6 @@
 # Publish Planmate without external API keys
 
-For **Netlify browser folder/ZIP uploads**, follow [NETLIFY-UPLOAD.md](NETLIFY-UPLOAD.md). That method supports personal planning in browser storage and cannot deploy the shared Node backend. The instructions below publish the complete shared application on a Node host.
+For **shared planning on the existing Netlify site**, follow [NETLIFY-SHARED.md](NETLIFY-SHARED.md). The new adapter uses Functions and private Blobs storage for guest trips. For **browser folder/ZIP uploads**, follow [NETLIFY-UPLOAD.md](NETLIFY-UPLOAD.md); that method remains personal planning only. The instructions below publish the complete application on a Node host.
 
 This release runs the complete website in guest mode. It opens with no saved trip, suggested members or itinerary. A visitor creates a trip or joins a friend's private invitation. The curated discovery catalogue contains reference places to browse; it does not create a trip. Existing saved personal plans remain accessible.
 
@@ -16,7 +16,7 @@ The internal `/api/*` endpoints must remain available: they provide shared plann
 
 Store the code on GitHub and connect it to a **Node web service with persistent disk**, HTTPS and one running instance. Keep pages and `/api/*` on the same origin; the reverse proxy must preserve the incoming Host header. Node 24.19.0 and pnpm 11.25.0 are pinned for this release.
 
-[GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages) serves static files and cannot run this Node server. [Netlify Functions](https://docs.netlify.com/build/functions/overview/) use a different runtime model; the current long-running server, SQLite file and local photo store need a backend/storage migration before the whole app can run there. Uploading `public/` alone would break invitations and persistence.
+[GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages) serves static files and cannot run this Node server. Netlify uses the separate [Functions/Blobs adapter](NETLIFY-SHARED.md), with guest memberships and the same planning commands. Uploading `public/` alone provides neither backend.
 
 The included `render.yaml` configures a GitHub-connected [Render Node web service](https://render.com/docs/deploy-node-express-app). **It uses paid compute and a paid 3 GB persistent disk.** Review [current pricing](https://render.com/pricing) before approving any deployment. No hosting resource is created by saving this file. Render's ordinary service filesystem is ephemeral, so the disk is required for this architecture; see [persistent disk requirements](https://render.com/docs/disks). A free Render service without that disk is unsuitable for durable shared trips and photos. A completely free solution needs a different storage/backend setup or an existing server you already operate.
 

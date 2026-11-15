@@ -41,8 +41,13 @@ function httpsUrl(value) {
         return "";
     }
 }
-function createDiscovery({ env = process.env, fetchImpl = globalThis.fetch, now = Date.now,
-    signingSecret, sessionStore } = {}) {
+function createDiscovery({
+    env = process.env,
+    fetchImpl = globalThis.fetch,
+    now = Date.now,
+    signingSecret,
+    sessionStore,
+} = {}) {
     const secret = signingSecret || crypto.randomBytes(32),
         sessions = sessionStore || new Map();
     const key = env.GOOGLE_PLACES_API_KEY;

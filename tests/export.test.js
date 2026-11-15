@@ -121,3 +121,27 @@ test("long and multiline notes paginate, while Unicode names and an over-budget 
         assert.equal(page.getHeight(), 841.89);
     }
 });
+
+test("train pages include journeys outside regional dates and paginate long shared notes", async () => {
+    const state = plan();
+    state.journeys = [
+        {
+            id: "train",
+            from: "Mumbai",
+            to: "Birur (RRB)",
+            train: "",
+            status: "tentative",
+            departureDate: "2026-10-08",
+            arrivalDate: "2026-10-09",
+            departureTime: "",
+            arrivalTime: "",
+            note: Array.from({ length: 120 }, () => "x").join("\n"),
+            by: "you",
+        },
+    ];
+    const bytes = await exporter.createPdf(state, { libraries });
+    const document = await libraries.PDFLib.PDFDocument.load(bytes);
+    assert.ok(document.getPageCount() >= 6);
+    assert.equal(exporter.buildModel(state).journeys[0].departureDate, "2026-10-08");
+    assert.equal(exporter.buildModel(state).journeys[0].arrivalTime, "");
+});

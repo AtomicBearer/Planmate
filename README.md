@@ -1,12 +1,14 @@
 # Planmate
 
+Chikkamagaluru discovery now includes 60 regional options with sources and access notes. Add manual overnight trains alongside your itinerary, invite friends into a shared trip, and include the journeys in your PDF. See [the regional guide](docs/CHIKKAMAGALURU.md) and [shared Netlify deployment](docs/NETLIFY-SHARED.md).
+
 Planmate turns a group's interests, availability and budgets into a plan everyone can review and explicitly agree to. It uses vanilla HTML/CSS/JavaScript and a Node server, preserving the cream, beige and brown scrapbook theme, sage/terracotta accents, handwritten headings, original travel artwork and reduced-motion support.
 
-For your chosen **Netlify browser folder upload**, use [NETLIFY-UPLOAD.md](docs/NETLIFY-UPLOAD.md). Run `pnpm run build:netlify` to prepare `output/netlify`, or extract the prepared `output/planmate-netlify.zip`. This upload supports personal plans saved in the browser; shared invitations and private photo uploads require a server deployment. The full Node/shared source remains intact.
+For **shared trips on Netlify**, use [NETLIFY-SHARED.md](docs/NETLIFY-SHARED.md). The included Git/CLI configuration builds the pages and deploys a Functions/Blobs guest backend. For personal-only folder uploads, use [NETLIFY-UPLOAD.md](docs/NETLIFY-UPLOAD.md) and `pnpm run build:netlify`. A folder upload cannot install the shared backend.
 
 The default release works without external API keys and starts with no saved trip. Fonts, artwork and PDF assets are local. Guest invitations and shared planning run through Planmate's own Node server; personal profiles stay on each device and names are unverified. Live discovery/photos, Google map backgrounds, verified routes/accounts and event feeds are optional and remain off when unconfigured.
 
-For GitHub-connected Node hosting, follow [Publish Planmate](docs/DEPLOYMENT.md). The included `render.yaml` uses paid compute with persistent disk; review its costs before deploying. GitHub Pages cannot run this backend, and a complete Netlify deployment needs a storage/runtime migration. `pnpm run check:launch` checks public configuration without printing credentials or making provider requests. The [API connection map](docs/API-CONNECTIONS.md) is retained for optional future integrations.
+For GitHub-connected Node hosting, follow [Publish Planmate](docs/DEPLOYMENT.md). The included `render.yaml` uses paid compute with persistent disk; review its costs before deploying. GitHub Pages cannot run this backend; Netlify uses its separate guest adapter. `pnpm run check:launch` checks Node-host configuration without printing credentials or making provider requests. The [API connection map](docs/API-CONNECTIONS.md) covers optional provider integrations.
 
 Source files are grouped into `public/` (pages/styles/browser scripts/assets), `shared/` (shared rules/catalogue), `server/` (API/services/storage), `docs/`, `scripts/` and `tests/`. The root `server.js` preserves launch commands; page URLs, invitations and the private root `data/` location remain compatible. Do not deploy `public/` alone for shared planning.
 
@@ -59,7 +61,7 @@ Drafts can schedule flexible late-night stops and published fixed-time events ac
 
 ## Discovery scope and Goa pilot
 
-The starter catalogue contains **110 places across 32 cities**, including 12 Goa picks. It is not exhaustive or evidence of current opening hours, ticket availability or prices. Original category illustrations are clearly labelled and never substituted as venue photos. A group may add any custom city or sourced place/event.
+The catalogue contains **170 options across 33 cities/regions**, including 12 Goa picks and 60 Chikkamagaluru regional places/experiences. It is not exhaustive or evidence of current opening hours, ticket availability or prices. Research leads and original category illustrations are clearly labelled. A group may add any custom city or sourced place/event.
 
 ```sh
 pnpm run check:pilot
@@ -154,5 +156,3 @@ Unit/server tests use isolated in-memory stores or disposable temporary director
 The browser default is Playwright Chromium. To use installed Chrome, set `PLANMATE_BROWSER_CHANNEL=chrome` in your shell before running the browser command. No machine-specific executable/dependency paths are embedded. The default Node test command disables worker isolation for compatibility with restricted local runners. CI installs Chromium and Linux browser dependencies and runs the same checks. The GitHub workflow is prepared locally; no remote CI run, push or deployment has occurred.
 
 Local Git is initialized. Exclusions cover .env secrets, data, SQLite files, media, backups, node_modules, package stores and browser artifacts. The dependency lockfile is maintained with pnpm; do not create a conflicting package-lock.json. Formatting configuration, linked-file/script-order checks and portable regression tests make later changes reviewable. Rebuild bundled PDF assets with `pnpm run prepare:pdf` when needed; this development step downloads open-licensed fonts from their official sources, while users export PDFs with local bundled assets.
-#   P l a n m a t e  
- 

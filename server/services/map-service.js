@@ -136,8 +136,7 @@ function createMapService({
                 key,
             }).toString();
             const token = crypto.randomBytes(24).toString("base64url");
-            if (!imageStore)
-                for (const [t, v] of images) if (v.expires < now()) images.delete(t);
+            if (!imageStore) for (const [t, v] of images) if (v.expires < now()) images.delete(t);
             if (images.size >= 200) throw new Error("Map previews are busy; try again shortly.");
             await images.set(token, { url: url.href, group, expires: now() + 600000 });
             result.imageToken = token;

@@ -65,3 +65,23 @@ test("upload build refuses to replace source folders or the parent output direct
         assert.throws(() => buildNetlify(target), /dedicated folder/);
     assert.equal(fs.existsSync(path.join(root, "public", "dashboard.html")), true);
 });
+
+test("shared build enables the API while shipping only browser assets", () => {
+    const target = fixture();
+    try {
+        buildNetlify(target, { shared: true });
+        for (const page of ["index.html", "dashboard.html", "profile.html"])
+            assert.doesNotMatch(
+                fs.readFileSync(path.join(target, page), "utf8"),
+                /content="device"/,
+            );
+        assert.ok(fs.existsSync(path.join(target, "shared/chikkamagaluru.js")));
+        assert.ok(fs.existsSync(path.join(target, "js/train-ui.js")));
+        assert.equal(
+            files(target).some((name) => /(^|\/)\.env|^server\/|^netlify\//.test(name)),
+            false,
+        );
+    } finally {
+        fs.rmSync(target, { recursive: true, force: true });
+    }
+});

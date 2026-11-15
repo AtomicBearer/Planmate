@@ -354,10 +354,14 @@
                         if (
                             !file ||
                             !file.size ||
-                            file.size > 5 * 1024 * 1024 ||
+                            file.size > (a.photoLimitBytes?.() || 5 * 1024 * 1024) ||
                             !["image/jpeg", "image/png"].includes(file.type)
                         )
-                            throw new Error("Choose a JPEG or PNG photo up to 5 MB.");
+                            throw new Error(
+                                "Choose a JPEG or PNG photo up to " +
+                                    (a.photoLimitBytes?.() || 5 * 1024 * 1024) / (1024 * 1024) +
+                                    " MB.",
+                            );
                         submit.textContent = "Uploading photo…";
                         await a.uploadPhoto(file, { stopId: f.dataset.id, caption: d.caption });
                         a.closeDialog();

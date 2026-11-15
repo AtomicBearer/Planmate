@@ -8,6 +8,7 @@
     const KEY = "planmateFormDraftsV1",
         MAX_AGE = 7 * 86400000;
     const fields = {
+        journey: "from to train departureDate departureTime arrivalDate arrivalTime status note",
         preferences: "interests pace budget mustHave needs",
         availability: "options",
         "add-date": "date start end endNextDay",
@@ -139,6 +140,7 @@
                 ["plan", "planForm"],
                 ["outing", "outingForm"],
                 ["memory", "memoryForm"],
+                ["train", "trainForm"],
             ]) {
                 const kind = form.dataset[attr];
                 if (Object.hasOwn(fields, kind))
@@ -170,6 +172,12 @@
         function exists(d) {
             const s = a.state();
             if (!s?.members.some((m) => m.id === context().member && !m.removed)) return false;
+            if (d.kind === "journey" && d.id)
+                return s.journeys?.some(
+                    (p) =>
+                        p.id === d.id &&
+                        (p.by === context().member || s.organizerId === context().member),
+                );
             if (["comment", "estimate", "schedule"].includes(d.kind))
                 return s.proposals.some(
                     (p) => p.id === d.id && (d.kind !== "schedule" || p.status === "pending"),
@@ -187,6 +195,12 @@
             return true;
         }
         function base(d) {
+            if (d.kind === "journey")
+                return JSON.stringify([
+                    a.state().journeys,
+                    a.state().stops,
+                    a.state().trip.timezone,
+                ]);
             const s = a.state(),
                 me = context().member;
             const slots = s.stops.map((p) => ({

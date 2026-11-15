@@ -42,7 +42,9 @@ function buildNetlify(target = path.join(outputRoot, "netlify"), { shared = fals
                 .readFileSync(source, "utf8")
                 .replace(
                     "<head>",
-                    shared ? "<head>" : '<head>\n        <meta name="planmate-storage" content="device" />',
+                    shared
+                        ? "<head>"
+                        : '<head>\n        <meta name="planmate-storage" content="device" />',
                 );
             fs.writeFileSync(destination, html);
         } else fs.copyFileSync(source, destination);
@@ -76,8 +78,9 @@ if (require.main === module) {
     const shared = process.argv.includes("--shared");
     console.log("Netlify output folder: " + buildNetlify(undefined, { shared }));
     console.log(
-        shared ? "Deploy with the Netlify functions from this repository to enable shared trips." :
-            "Personal plans use browser storage. Shared trips and private photo uploads need a server deployment.",
+        shared
+            ? "Deploy with the Netlify functions from this repository to enable shared trips."
+            : "Personal plans use browser storage. Shared trips and private photo uploads need a server deployment.",
     );
 }
 module.exports = { buildNetlify, licenseFiles };
